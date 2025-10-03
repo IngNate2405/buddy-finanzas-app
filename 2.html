@@ -32,13 +32,20 @@
         const service = window.firebaseServiceInstance || new window.FirebaseService();
         window.firebaseServiceInstance = service;
 
-        // Verificar estado de auth real
+        // Verificar estado de auth real con tolerancia al estado inicial null
         service.onAuthStateChanged((user) => {
-          if (!user) {
-            window.location.href = 'login.html';
+          if (user) {
+            window.isAuthReady = true;
             return;
           }
-          // Usuario autenticado: habilitar UI si fuese necesario
+          setTimeout(() => {
+            const retryUser = service.getCurrentUser();
+            if (retryUser) {
+              window.isAuthReady = true;
+            } else {
+              window.location.href = 'login.html';
+            }
+          }, 1200);
         });
       })();
     });
@@ -418,6 +425,10 @@
         try {
           // Get the transaction to edit from Firebase
           const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
+          if (!window.isAuthReady) {
+            // Seguridad extra: si la auth aún no está lista, rehúsa guardar y reintenta
+            await new Promise(r => setTimeout(r, 400));
+          }
           const transactions = await firebaseService.loadTransactions();
           const transaction = transactions.find(t => t.id == this.editingTransactionId);
           
@@ -1227,6 +1238,9 @@
           
           // Save to Firebase
           const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
+          if (!window.isAuthReady) {
+            await new Promise(r => setTimeout(r, 400));
+          }
           const existingTransactions = await firebaseService.loadTransactions();
           
           if (this.isEditMode) {
