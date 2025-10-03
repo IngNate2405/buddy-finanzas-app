@@ -16,6 +16,33 @@
     }
   </style>
   <script type="module" src="firebase-config.js"></script>
+  <script>
+    // Esperar Firebase y estado de auth antes de usar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      (async () => {
+        // Esperar a que FirebaseService esté disponible
+        await new Promise(resolve => {
+          if (window.FirebaseService) return resolve();
+          const t = setInterval(() => {
+            if (window.FirebaseService) { clearInterval(t); resolve(); }
+          }, 100);
+        });
+
+        // Crear/reusar instancia
+        const service = window.firebaseServiceInstance || new window.FirebaseService();
+        window.firebaseServiceInstance = service;
+
+        // Verificar estado de auth real
+        service.onAuthStateChanged((user) => {
+          if (!user) {
+            window.location.href = 'login.html';
+            return;
+          }
+          // Usuario autenticado: habilitar UI si fuese necesario
+        });
+      })();
+    });
+  </script>
 </head>
 <body class="bg-[#232B2E] text-white min-h-screen flex flex-col items-center justify-start pt-20">
   <!-- Container -->
@@ -390,7 +417,7 @@
       async loadTransactionData() {
         try {
           // Get the transaction to edit from Firebase
-          const firebaseService = new window.FirebaseService();
+          const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
           const transactions = await firebaseService.loadTransactions();
           const transaction = transactions.find(t => t.id == this.editingTransactionId);
           
@@ -1199,7 +1226,7 @@
           
           
           // Save to Firebase
-          const firebaseService = new window.FirebaseService();
+          const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
           const existingTransactions = await firebaseService.loadTransactions();
           
           if (this.isEditMode) {
