@@ -430,7 +430,7 @@
         
         try {
           // Get transactions from Firebase
-          const firebaseService = new window.FirebaseService();
+          const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
           const savedTransactions = await firebaseService.loadTransactions();
           console.log('💾 Transacciones en Firebase:', savedTransactions.length);
         
@@ -467,7 +467,7 @@
         try {
           console.log('🔍 Buscando categoría:', category);
           // Get categories from Firebase
-          const firebaseService = new window.FirebaseService();
+          const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
           const categoriesData = await firebaseService.loadCategories();
           
           console.log('📋 Categorías cargadas desde Firebase:', Object.keys(categoriesData || {}).length);
@@ -1669,9 +1669,9 @@
     }
 
     // Initialize the month navigator when the page loads
-    let monthNavigator;
+    window.monthNavigator = null;
     document.addEventListener('DOMContentLoaded', () => {
-      monthNavigator = new MonthNavigator();
+      // MonthNavigator se creará después de que Firebase esté listo
       
       // Categories will be initialized from Firestore
       
@@ -1755,16 +1755,25 @@
         });
 
         const firebaseService = new window.FirebaseService();
+        window.firebaseServiceInstance = firebaseService;
 
         // Wait for real auth state before deciding (handle initial null)
         firebaseService.onAuthStateChanged((user) => {
           if (user) {
-            initializeAppData(firebaseService);
+            initializeAppData(firebaseService).then(() => {
+              if (!window.monthNavigator) {
+                window.monthNavigator = new MonthNavigator();
+              }
+            });
           } else {
             setTimeout(() => {
               const retryUser = firebaseService.getCurrentUser();
               if (retryUser) {
-                initializeAppData(firebaseService);
+                initializeAppData(firebaseService).then(() => {
+                  if (!window.monthNavigator) {
+                    window.monthNavigator = new MonthNavigator();
+                  }
+                });
               } else {
                 window.location.href = 'login.html';
               }
