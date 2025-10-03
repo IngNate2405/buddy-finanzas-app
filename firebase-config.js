@@ -46,6 +46,11 @@ class FirebaseService {
 
   // Get current user ID from auth
   getUserId() {
+    // Check if in development mode
+    if (localStorage.getItem('devMode') === 'true') {
+      return localStorage.getItem('userId') || 'dev_user';
+    }
+    
     const user = this.auth.currentUser;
     return user ? user.uid : null;
   }
@@ -114,6 +119,12 @@ class FirebaseService {
   // Save transactions to Firestore
   async saveTransactions(transactions) {
     try {
+      // Check if in development mode
+      if (localStorage.getItem('devMode') === 'true') {
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        return;
+      }
+      
       const userDocRef = doc(this.db, 'users', this.userId);
       
       // Get existing document to preserve other fields
@@ -142,6 +153,12 @@ class FirebaseService {
   // Load transactions from Firestore
   async loadTransactions() {
     try {
+      // Check if in development mode
+      if (localStorage.getItem('devMode') === 'true') {
+        const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        return transactions;
+      }
+      
       const userDocRef = doc(this.db, 'users', this.userId);
       const docSnap = await getDoc(userDocRef);
       
@@ -171,6 +188,12 @@ class FirebaseService {
   // Load categories from Firestore
   async loadCategories() {
     try {
+      // Check if in development mode
+      if (localStorage.getItem('devMode') === 'true') {
+        const categories = JSON.parse(localStorage.getItem('categoriesData') || '{}');
+        return categories;
+      }
+      
       const userDocRef = doc(this.db, 'users', this.userId);
       const docSnap = await getDoc(userDocRef);
       

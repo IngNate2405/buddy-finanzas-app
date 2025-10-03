@@ -7,12 +7,14 @@
   <script>
     // Check if user is logged in
     const userEmail = localStorage.getItem('userEmail');
-    if (userEmail) {
+    const devMode = localStorage.getItem('devMode');
+    
+    if (userEmail || devMode === 'true') {
       // User is logged in, go to main app
       window.location.href = '1.html';
     } else {
-      // User is not logged in, go to login
-      window.location.href = 'login-firebase.html';
+      // User is not logged in, go to development login
+      window.location.href = 'login-dev.html';
     }
   </script>
 </head>
