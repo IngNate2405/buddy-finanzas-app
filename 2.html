@@ -43,7 +43,8 @@
             if (retryUser) {
               window.isAuthReady = true;
             } else {
-              window.location.href = 'login.html';
+              // No redirigir; seguir esperando sin sacar al usuario
+              window.isAuthReady = false;
             }
           }, 1200);
         });
@@ -66,7 +67,7 @@
         <h2 id="transactionTitle" class="text-xs tracking-widest uppercase font-normal text-white opacity-70">
           New Transaction
         </h2>
-        <span class="text-xs text-gray-500">v2.3.4</span>
+        <span class="text-xs text-gray-500">v2.4.2 - TX Auth</span>
       </div>
     </div>
 
