@@ -46,11 +46,6 @@ class FirebaseService {
 
   // Get current user ID from auth
   getUserId() {
-    // Check if in development mode
-    if (localStorage.getItem('devMode') === 'true') {
-      return localStorage.getItem('userId') || 'dev_user';
-    }
-    
     const user = this.auth.currentUser;
     return user ? user.uid : null;
   }
@@ -119,13 +114,12 @@ class FirebaseService {
   // Save transactions to Firestore
   async saveTransactions(transactions) {
     try {
-      // Check if in development mode
-      if (localStorage.getItem('devMode') === 'true') {
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-        return;
+      const userId = this.getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
       }
       
-      const userDocRef = doc(this.db, 'users', this.userId);
+      const userDocRef = doc(this.db, 'users', userId);
       
       // Get existing document to preserve other fields
       const docSnap = await getDoc(userDocRef);
@@ -153,13 +147,12 @@ class FirebaseService {
   // Load transactions from Firestore
   async loadTransactions() {
     try {
-      // Check if in development mode
-      if (localStorage.getItem('devMode') === 'true') {
-        const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-        return transactions;
+      const userId = this.getUserId();
+      if (!userId) {
+        return [];
       }
       
-      const userDocRef = doc(this.db, 'users', this.userId);
+      const userDocRef = doc(this.db, 'users', userId);
       const docSnap = await getDoc(userDocRef);
       
       if (docSnap.exists()) {
@@ -176,7 +169,12 @@ class FirebaseService {
   // Save categories to Firestore
   async saveCategories(categories) {
     try {
-      const userDocRef = doc(this.db, 'users', this.userId);
+      const userId = this.getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      const userDocRef = doc(this.db, 'users', userId);
       await setDoc(userDocRef, {
         categories: categories,
         lastUpdated: new Date()
@@ -188,13 +186,12 @@ class FirebaseService {
   // Load categories from Firestore
   async loadCategories() {
     try {
-      // Check if in development mode
-      if (localStorage.getItem('devMode') === 'true') {
-        const categories = JSON.parse(localStorage.getItem('categoriesData') || '{}');
-        return categories;
+      const userId = this.getUserId();
+      if (!userId) {
+        return {};
       }
       
-      const userDocRef = doc(this.db, 'users', this.userId);
+      const userDocRef = doc(this.db, 'users', userId);
       const docSnap = await getDoc(userDocRef);
       
       if (docSnap.exists()) {
