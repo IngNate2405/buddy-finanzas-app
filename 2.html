@@ -1412,18 +1412,16 @@
       }
     }
 
-    // Initialize when page loads
-    let transactionForm;
+    // Crear el formulario sólo tras auth lista
     document.addEventListener('DOMContentLoaded', () => {
-      // Check if user is logged in
-      const userEmail = localStorage.getItem('userEmail');
-      if (!userEmail) {
-        // User is not logged in, redirect to login
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      transactionForm = new TransactionForm();
+      const tryInit = () => {
+        if (window.isAuthReady) {
+          window.transactionForm = new TransactionForm();
+        } else {
+          setTimeout(tryInit, 200);
+        }
+      };
+      tryInit();
     });
   </script>
 </body>
