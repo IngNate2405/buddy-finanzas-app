@@ -46,16 +46,16 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-          <span class="text-xs text-gray-400">v2.4.1 - Auth Persist</span>
+          <span class="text-xs text-gray-400">v2.5.0 - Telegram Bot</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
-    <button id="logoutBtn" aria-label="Logout" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Cerrar Sesión">
-     <i class="fas fa-sign-out-alt">
+    <button id="telegramBtn" aria-label="Telegram Settings" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Configuración Telegram" onclick="openTelegramSettings()">
+     <i class="fab fa-telegram">
      </i>
     </button>
-    <button id="whatsappBtn" aria-label="WhatsApp Settings" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Configuración WhatsApp" onclick="openWhatsAppSettings()">
-     <i class="fab fa-whatsapp">
+    <button id="logoutBtn" aria-label="Logout" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Cerrar Sesión">
+     <i class="fas fa-sign-out-alt">
      </i>
     </button>
     <button id="clearCacheBtn" aria-label="Clear Cache" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Limpiar Cache">
@@ -1658,14 +1658,14 @@
        }
     }
 
-    // Function to open WhatsApp settings
-    function openWhatsAppSettings() {
-      try {
-        console.log('📱 Abriendo configuración de WhatsApp...');
-        window.location.href = 'whatsapp-settings.html';
-      } catch (error) {
-        console.error('❌ Error abriendo configuración de WhatsApp:', error);
-      }
+
+    // Function to open Telegram settings
+    function openTelegramSettings() {
+        try {
+            window.location.href = 'telegram-settings.html';
+        } catch (error) {
+            console.error('❌ Error abriendo configuración de Telegram:', error);
+        }
     }
 
     // Initialize the month navigator when the page loads

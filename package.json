@@ -1,0 +1,29 @@
+{
+  "name": "buddy-finanzas-app",
+  "version": "2.5.0",
+  "description": "Buddy Finanzas - Aplicación de gestión financiera personal con integración de Telegram Bot",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo No build needed for static site",
+    "deploy": "echo Deploy to GitHub Pages"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "finanzas",
+    "presupuesto",
+    "telegram",
+    "bot",
+    "firebase",
+    "pwa"
+  ],
+  "author": "IngNate2405",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IngNate2405/buddy-finanzas-app.git"
+  }
+}

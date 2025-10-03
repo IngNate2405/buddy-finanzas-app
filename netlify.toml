@@ -1,0 +1,14 @@
+[build]
+  command = "echo No build needed for serverless functions"
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/telegram"
+  to = "/.netlify/functions/telegram"
+  status = 200
+
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/health"
+  status = 200

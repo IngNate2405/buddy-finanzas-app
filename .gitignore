@@ -55,3 +55,7 @@ build/
 
 # WhatsApp Webhook (separate repository)
 buddy-finanzas-whatsapp/
+
+# Telegram Bot
+telegram-config.env
+telegram-token.txt
