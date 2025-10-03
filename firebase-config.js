@@ -20,12 +20,10 @@ try {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
   auth = getAuth(app);
-  try {
-    // Ensure session persists across tabs/reloads
-    await setPersistence(auth, browserLocalPersistence);
-  } catch (e) {
+  // Ensure session persists across tabs/reloads (no top-level await)
+  setPersistence(auth, browserLocalPersistence).catch((e) => {
     console.error('No se pudo establecer persistencia de sesión:', e);
-  }
+  });
 } catch (error) {
   console.error('Error initializing Firebase:', error);
   // Fallback configuration for development
