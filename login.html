@@ -212,8 +212,8 @@
 
           await this.firebaseService.signIn(email, password);
           this.showMessage('Inicio de sesión exitoso', 'success');
-          
-          // Redirect will happen automatically via auth state change
+          // Redirección explícita tras login exitoso
+          setTimeout(() => { window.location.href = '1.html'; }, 400);
         } catch (error) {
           this.showMessage(this.getErrorMessage(error.code), 'error');
         } finally {
@@ -244,8 +244,8 @@
 
           await this.firebaseService.signUp(email, password);
           this.showMessage('Cuenta creada exitosamente', 'success');
-          
-          // Redirect will happen automatically via auth state change
+          // Redirección explícita tras registro exitoso
+          setTimeout(() => { window.location.href = '1.html'; }, 400);
         } catch (error) {
           this.showMessage(this.getErrorMessage(error.code), 'error');
         } finally {
