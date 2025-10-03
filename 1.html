@@ -1755,15 +1755,16 @@
         });
 
         const firebaseService = new window.FirebaseService();
-        const user = firebaseService.getCurrentUser();
-        if (!user) {
-          window.location.href = 'login.html';
-          return;
-        }
 
-        // User is logged in, continue with app initialization
-        initializeAppData(firebaseService);
-        
+        // Wait for real auth state before deciding
+        firebaseService.onAuthStateChanged((user) => {
+          if (user) {
+            initializeAppData(firebaseService);
+          } else {
+            window.location.href = 'login.html';
+          }
+        });
+
       } catch (error) {
         // If Firebase fails, still allow app to work with localStorage
         initializeAppData(null);
