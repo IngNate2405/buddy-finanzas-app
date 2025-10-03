@@ -36,17 +36,29 @@
         service.onAuthStateChanged((user) => {
           if (user) {
             window.isAuthReady = true;
+            const overlay = document.getElementById('authOverlay');
+            if (overlay) overlay.style.display = 'none';
+            if (!window.transactionForm) {
+              window.transactionForm = new TransactionForm();
+            }
             return;
           }
-          setTimeout(() => {
+          // Mostrar overlay y seguir reintentando sin redirigir
+          const overlay = document.getElementById('authOverlay');
+          if (overlay) overlay.style.display = 'flex';
+          const poll = () => {
             const retryUser = service.getCurrentUser();
             if (retryUser) {
               window.isAuthReady = true;
+              if (overlay) overlay.style.display = 'none';
+              if (!window.transactionForm) {
+                window.transactionForm = new TransactionForm();
+              }
             } else {
-              // No redirigir; seguir esperando sin sacar al usuario
-              window.isAuthReady = false;
+              setTimeout(poll, 800);
             }
-          }, 1200);
+          };
+          setTimeout(poll, 800);
         });
       })();
     });
@@ -168,6 +180,13 @@
         <button id="saveTransactionBtn" class="bg-[#121616] rounded-full px-6 py-3 text-white text-xs font-normal tracking-widest uppercase hover:bg-[#1a1a1a] transition-colors opacity-70 flex-1">
           Save
         </button>
+      </div>
+    </div>
+
+    <!-- Auth overlay -->
+    <div id="authOverlay" class="fixed inset-0 bg-black/70 text-white flex items-center justify-center text-sm" style="display:none;">
+      <div class="bg-[#1b1f20] px-6 py-4 rounded-xl border border-gray-700">
+        Conectando con tu sesión...
       </div>
     </div>
 
