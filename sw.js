@@ -1,12 +1,13 @@
 const CACHE_NAME = 'buddy-finanzas-v1';
+const BASE_PATH = '/buddy-finanzas-app';
 const urlsToCache = [
-  '/',
-  '/1.html',
-  '/2.html',
-  '/3.html',
-  '/4.html',
-  '/manifest.json',
-  '/firebase-config.js',
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/1.html`,
+  `${BASE_PATH}/2.html`,
+  `${BASE_PATH}/3.html`,
+  `${BASE_PATH}/4.html`,
+  `${BASE_PATH}/manifest.json`,
+  `${BASE_PATH}/firebase-config.js`,
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'
 ];

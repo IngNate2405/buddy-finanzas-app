@@ -2,7 +2,7 @@
   "name": "Buddy Finanzas",
   "short_name": "BuddyFin",
   "description": "Aplicación de gestión financiera personal",
-  "start_url": "/1.html",
+  "start_url": "/buddy-finanzas-app/1.html",
   "display": "standalone",
   "background_color": "#0f1618",
   "theme_color": "#a64fff",

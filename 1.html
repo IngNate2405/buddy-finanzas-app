@@ -269,15 +269,27 @@
    </nav>
 
   <script>
+    // Disable console logs on production (GitHub Pages)
+    (function(){
+      const isProd = /github\.io$/i.test(location.hostname);
+      if (isProd && window.console) {
+        try {
+          console.log = function(){};
+          console.info = function(){};
+          console.debug = function(){};
+          console.warn = console.warn || function(){};
+        } catch(e){}
+      }
+    })();
     // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('./sw.js')
           .then((registration) => {
-            console.log('SW registered: ', registration);
+            // SW registered
           })
           .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
+            // SW registration failed
           });
       });
     }
