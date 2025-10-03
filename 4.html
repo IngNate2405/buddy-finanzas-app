@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Categories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-[#1a1a1a] to-[#111111] text-white min-h-screen">
+  <div class="max-w-md mx-auto pt-6 pb-20 px-4">
+    <!-- Top bar -->
+    <div class="flex items-center justify-between mb-4">
+      <button id="backBtn" aria-label="Back" class="text-white text-2xl leading-none">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 class="text-white text-sm tracking-widest font-semibold">CATEGORIES</h1>
+      <div class="flex space-x-4 text-white text-xl">
+        <button id="editCategoriesBtn" aria-label="Edit" class="leading-none" onclick="editCategories()">
+          <i class="fas fa-pen"></i>
+        </button>
+        <button aria-label="Add" class="leading-none">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search bar -->
+    <div class="mb-6">
+      <div class="flex items-center bg-[#2c2c2c] rounded-xl px-4 py-3">
+        <i class="fas fa-search text-gray-400 text-lg"></i>
+        <input
+          type="search"
+          id="categorySearch"
+          name="categorySearch"
+          placeholder=""
+          class="bg-transparent text-white placeholder-transparent focus:outline-none ml-3 w-full"
+          aria-label="Search categories"
+        />
+      </div>
+    </div>
+
+
+    <!-- Most frequent -->
+    <div id="mostFrequentSection" class="mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-white text-lg font-normal">Most frequent</h2>
+        <button aria-label="Toggle Most frequent visibility" class="text-white text-xl">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      <hr class="border-gray-600 mb-4" />
+      <div id="mostFrequentCategories" class="flex space-x-8">
+        <!-- Most frequent categories will be dynamically loaded here -->
+      </div>
+    </div>
+
+    <!-- Miscellaneous -->
+    <div id="miscellaneousSection" class="mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-white text-xl font-normal">Miscellaneous</h2>
+        <button aria-label="Toggle Miscellaneous visibility" class="text-white text-xl">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      <hr class="border-gray-600 mb-4" />
+      <div id="miscellaneousCategories" class="grid grid-cols-4 gap-x-4 gap-y-6">
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="clothes">
+          <div class="w-14 h-14 rounded-full bg-gray-400 bg-opacity-40 flex items-center justify-center">
+            <i class="fas fa-tshirt text-white text-xl opacity-70"></i>
+          </div>
+          <span class="text-white text-xs text-center">Clothes</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="healthcare">
+          <div class="w-14 h-14 rounded-full bg-gray-400 bg-opacity-40 flex items-center justify-center">
+            <i class="fas fa-heart text-white text-xl opacity-70"></i>
+          </div>
+          <span class="text-white text-xs text-center">Healthcare</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="miscellaneous">
+          <div class="w-14 h-14 rounded-full bg-gray-400 bg-opacity-40 flex items-center justify-center">
+            <i class="fas fa-box text-white text-xl opacity-70"></i>
+          </div>
+          <span class="text-white text-xs text-center">Miscellaneous</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="student_loan">
+          <div class="w-14 h-14 rounded-full bg-gray-400 bg-opacity-40 flex items-center justify-center">
+            <i class="fas fa-graduation-cap text-white text-xl opacity-70"></i>
+          </div>
+          <span class="text-white text-xs text-center">Student loan</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="transfer">
+          <div class="w-14 h-14 rounded-full bg-gray-400 bg-opacity-40 flex items-center justify-center">
+            <i class="fas fa-university text-white text-xl opacity-70"></i>
+          </div>
+          <span class="text-white text-xs text-center">Transferencia</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="unknown">
+          <div class="w-14 h-14 rounded-full bg-gray-400 bg-opacity-40 flex items-center justify-center">
+            <i class="fas fa-university text-white text-xl opacity-70"></i>
+          </div>
+          <span class="text-white text-xs text-center">Unknown</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Entertainment -->
+    <div id="entertainmentSection" class="mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-white text-xl font-normal">Entertainment</h2>
+        <button aria-label="Toggle Entertainment visibility" class="text-white text-xl">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      <hr class="border-gray-600 mb-4" />
+      <div id="entertainmentCategories" class="grid grid-cols-4 gap-x-4 gap-y-6">
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="bowling">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-bowling-ball text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Bowling</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="cinema">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-video text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Cinema</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="concert">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-microphone text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Concert</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="electronics">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-bolt text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Electronics</span>
+        </button>
+
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="entertainment">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-smile text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Entertainment</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="gym">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-dumbbell text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Gym</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="nightclub">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-beer text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Nightclub</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="sports">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-futbol text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Sports</span>
+        </button>
+
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="subscription">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-play-circle text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Subscription</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="temu">
+          <div class="w-14 h-14 rounded-full bg-yellow-400 flex items-center justify-center">
+            <i class="fas fa-box text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Temu</span>
+        </button>
+        <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="vacation">
+          <div class="w-14 h-14 rounded-full bg-pink-400 flex items-center justify-center">
+            <i class="fas fa-cocktail text-white text-xl"></i>
+          </div>
+          <span class="text-white text-xs text-center">Vacation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class CategorySelector {
+      constructor() {
+        // Default categories from 5.html structure
+        this.defaultCategoriesData = {
+            'Entertainment': [
+                { name: 'Bowling', icon: 'fas fa-bowling-ball', color: 'bg-pink-400' },
+                { name: 'Cinema', icon: 'fas fa-video', color: 'bg-pink-400' },
+                { name: 'Concert', icon: 'fas fa-microphone', color: 'bg-pink-400' },
+                { name: 'Electronics', icon: 'fas fa-bolt', color: 'bg-pink-400' },
+                { name: 'Entertainment', icon: 'fas fa-smile', color: 'bg-pink-400' },
+                { name: 'Gym', icon: 'fas fa-dumbbell', color: 'bg-pink-400' },
+                { name: 'Nightclub', icon: 'fas fa-beer', color: 'bg-pink-400' },
+                { name: 'Sports', icon: 'fas fa-futbol', color: 'bg-pink-400' },
+                { name: 'Subscription', icon: 'fas fa-gift', color: 'bg-pink-400' },
+                { name: 'Temu', icon: 'fas fa-shopping-bag', color: 'bg-yellow-400' },
+                { name: 'Vacation', icon: 'fas fa-cocktail', color: 'bg-pink-400' }
+            ],
+            'Food & drinks': [
+                { name: 'Coffee', icon: 'fas fa-coffee', color: 'bg-blue-400' },
+                { name: 'Drinks', icon: 'fas fa-glass-martini', color: 'bg-blue-400' },
+                { name: 'Food', icon: 'fas fa-utensils', color: 'bg-blue-400' },
+                { name: 'Groceries', icon: 'fas fa-shopping-cart', color: 'bg-blue-400' },
+                { name: 'Restaurant', icon: 'fas fa-building', color: 'bg-blue-400' },
+                { name: 'Snack', icon: 'fas fa-candy-cane', color: 'bg-blue-400' }
+            ],
+            'Housing': [
+                { name: 'Bank', icon: 'fas fa-university', color: 'bg-orange-400' },
+                { name: 'Bills', icon: 'fas fa-home', color: 'bg-orange-400' },
+                { name: 'Compras en línea', icon: 'fas fa-shopping-bag', color: 'bg-orange-400' },
+                { name: 'Electricity', icon: 'fas fa-bolt', color: 'bg-orange-400' },
+                { name: 'Hair cut', icon: 'fas fa-cut', color: 'bg-red-400' },
+                { name: 'Housing', icon: 'fas fa-home', color: 'bg-orange-400' },
+                { name: 'Internet', icon: 'fas fa-wifi', color: 'bg-orange-400' },
+                { name: 'Loan', icon: 'fas fa-money-bill', color: 'bg-orange-400' },
+                { name: 'Maintenance', icon: 'fas fa-hammer', color: 'bg-orange-400' },
+                { name: 'Rent', icon: 'fas fa-university', color: 'bg-orange-400' },
+                { name: 'Service', icon: 'fas fa-box', color: 'bg-orange-400' },
+                { name: 'TV', icon: 'fas fa-tv', color: 'bg-orange-400' },
+                { name: 'Taxes', icon: 'fas fa-money-bill', color: 'bg-orange-400' },
+                { name: 'Telephone', icon: 'fas fa-phone', color: 'bg-orange-400' },
+                { name: 'Water', icon: 'fas fa-tint', color: 'bg-orange-400' }
+            ],
+            'Lifestyle': [
+                { name: 'Haircut', icon: 'fas fa-smile', color: 'bg-red-400' },
+                { name: 'Iglesia', icon: 'fas fa-home', color: 'bg-yellow-400' },
+                { name: 'Lifestyle', icon: 'fas fa-star', color: 'bg-red-400' },
+                { name: 'Office expenses', icon: 'fas fa-briefcase', color: 'bg-red-400' },
+                { name: 'Papás', icon: 'fas fa-heart', color: 'bg-red-400' },
+                { name: 'Pet', icon: 'fas fa-paw', color: 'bg-red-400' },
+                { name: 'Pharmacy', icon: 'fas fa-band-aid', color: 'bg-red-400' },
+                { name: 'RollOver', icon: 'fas fa-sync', color: 'bg-blue-400' },
+                { name: 'Shopping', icon: 'fas fa-shopping-cart', color: 'bg-red-400' },
+                { name: 'Travel', icon: 'fas fa-plane', color: 'bg-red-400' },
+                { name: 'Work', icon: 'fas fa-briefcase', color: 'bg-red-400' }
+            ],
+            'Miscellaneous': [
+                { name: 'Clothes', icon: 'fas fa-tshirt', color: 'bg-gray-400' },
+                { name: 'Healthcare', icon: 'fas fa-heart', color: 'bg-gray-400' },
+                { name: 'Miscellaneous', icon: 'fas fa-box', color: 'bg-gray-400' },
+                { name: 'Student loan', icon: 'fas fa-graduation-cap', color: 'bg-gray-400' },
+                { name: 'Transferencia', icon: 'fas fa-university', color: 'bg-gray-400' },
+                { name: 'Unknown', icon: 'fas fa-university', color: 'bg-gray-400' }
+            ],
+            'Savings': [
+                { name: 'Ahorros - GYT', icon: 'fas fa-piggy-bank', color: 'bg-red-400' },
+                { name: 'Car', icon: 'fas fa-car', color: 'bg-blue-400' },
+                { name: 'Emergency savings', icon: 'fas fa-star', color: 'bg-blue-400' },
+                { name: 'Vacation savings', icon: 'fas fa-cocktail', color: 'bg-blue-400' }
+            ],
+            'Transportation': [
+                { name: 'Car costs', icon: 'fas fa-car', color: 'bg-purple-400' },
+                { name: 'Car insurance', icon: 'fas fa-file-alt', color: 'bg-purple-400' },
+                { name: 'Car loan', icon: 'fas fa-car', color: 'bg-purple-400' },
+                { name: 'Flight', icon: 'fas fa-plane', color: 'bg-purple-400' },
+                { name: 'Gas', icon: 'fas fa-gas-pump', color: 'bg-purple-400' },
+                { name: 'Lavado auto', icon: 'fas fa-car', color: 'bg-purple-400' },
+                { name: 'Parking', icon: 'fas fa-parking', color: 'bg-purple-400' },
+                { name: 'Repair', icon: 'fas fa-wrench', color: 'bg-purple-400' },
+                { name: 'Transportation', icon: 'fas fa-train', color: 'bg-purple-400' },
+                { name: 'Uber/Taxi', icon: 'fas fa-car', color: 'bg-purple-400' }
+            ],
+            'Income': [
+                { name: 'Child benefit', icon: 'fas fa-child', color: 'bg-green-400' },
+                { name: 'Income', icon: 'fas fa-money-bill', color: 'bg-green-400' },
+                { name: 'Interest', icon: 'fas fa-university', color: 'bg-green-400' },
+                { name: 'Investments', icon: 'fas fa-chart-line', color: 'bg-green-400' },
+                { name: 'Pagos', icon: 'fas fa-wallet', color: 'bg-yellow-400' },
+                { name: 'Pension', icon: 'fas fa-shield-alt', color: 'bg-green-400' },
+                { name: 'Salary', icon: 'fas fa-money-bill', color: 'bg-green-400' }
+            ]
+        };
+
+        this.categories = {};
+        
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.loadCategoriesFromStorage();
+        this.loadMostFrequentCategories();
+        this.renderAllCategories();
+      }
+
+      loadCategoriesFromStorage() {
+        // Load categories from localStorage (saved in 5.html)
+        const savedCategories = localStorage.getItem('categoriesData');
+        
+        if (savedCategories) {
+          const categoriesData = JSON.parse(savedCategories);
+          
+          // Convert the saved categories to the format expected by this class
+          Object.entries(categoriesData).forEach(([sectionName, categories]) => {
+            categories.forEach(category => {
+              // Convert category name to lowercase key for compatibility
+              const key = category.name.toLowerCase().replace(/\s+/g, '_');
+              this.categories[key] = {
+                name: category.name,
+                icon: category.icon,
+                color: category.color,
+                section: sectionName
+              };
+            });
+          });
+        } else {
+          // If no saved categories, save the default ones to localStorage
+          localStorage.setItem('categoriesData', JSON.stringify(this.defaultCategoriesData));
+          
+          // Use default categories from 5.html structure
+          Object.entries(this.defaultCategoriesData).forEach(([sectionName, categories]) => {
+            categories.forEach(category => {
+              const key = category.name.toLowerCase().replace(/\s+/g, '_');
+              this.categories[key] = {
+                name: category.name,
+                icon: category.icon,
+                color: category.color,
+                section: sectionName
+              };
+            });
+          });
+        }
+      }
+
+      bindEvents() {
+        // Back button
+        document.getElementById('backBtn').addEventListener('click', () => {
+          window.history.back();
+        });
+
+        // Edit categories button
+        document.getElementById('editCategoriesBtn').addEventListener('click', () => {
+          editCategories();
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector('input[type="search"]');
+        searchInput.addEventListener('input', (e) => {
+          this.filterCategories(e.target.value);
+        });
+
+        // Toggle visibility buttons (eye icons)
+        document.querySelectorAll('button[aria-label*="Toggle"]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleSectionVisibility(btn);
+          });
+        });
+
+        // Category selection (using event delegation)
+        document.addEventListener('click', (e) => {
+          if (e.target.closest('.category-selector')) {
+            const category = e.target.closest('.category-selector').dataset.category;
+            this.selectCategory(category);
+          }
+        });
+      }
+
+      loadMostFrequentCategories() {
+        // Get transactions from localStorage
+        const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        
+        // Count category usage
+        const categoryCount = {};
+        transactions.forEach(transaction => {
+          if (transaction.category) {
+            categoryCount[transaction.category] = (categoryCount[transaction.category] || 0) + 1;
+          }
+        });
+        
+        // Get top 2 most frequent categories
+        const mostFrequent = Object.entries(categoryCount)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 2)
+          .map(([category]) => category);
+        
+        // If no transactions, show default categories
+        if (mostFrequent.length === 0) {
+          mostFrequent.push('gas', 'groceries');
+        }
+        
+        this.renderMostFrequentCategories(mostFrequent);
+      }
+
+      renderMostFrequentCategories(categories) {
+        const container = document.getElementById('mostFrequentCategories');
+        container.innerHTML = categories.map(category => {
+          const cat = this.categories[category];
+          if (!cat) return '';
+          
+          return `
+            <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="${category}">
+              <div class="w-14 h-14 rounded-full ${cat.color} flex items-center justify-center">
+                <i class="${cat.icon} text-white text-2xl"></i>
+              </div>
+              <span class="text-white text-xs">${cat.name}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      renderAllCategories() {
+        // Always use categories from this.categories object
+        // Clear existing sections
+        this.clearExistingSections();
+        
+        // Group categories by section
+        const categoriesBySection = {};
+        Object.values(this.categories).forEach(category => {
+          const section = category.section || 'Miscellaneous';
+          if (!categoriesBySection[section]) {
+            categoriesBySection[section] = [];
+          }
+          categoriesBySection[section].push(category);
+        });
+        
+        // Render each section
+        Object.entries(categoriesBySection).forEach(([sectionName, categories]) => {
+          this.renderDynamicSection(sectionName, categories);
+        });
+      }
+
+      clearExistingSections() {
+        // Remove existing hardcoded sections
+        const existingSections = ['miscellaneousSection', 'entertainmentSection'];
+        existingSections.forEach(sectionId => {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.remove();
+          }
+        });
+      }
+
+      renderDynamicSection(sectionName, categories) {
+        // Create section container
+        const sectionDiv = document.createElement('div');
+        sectionDiv.id = `${sectionName.toLowerCase().replace(/\s+/g, '')}Section`;
+        sectionDiv.className = 'mb-6';
+        
+        // Create section header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'flex items-center justify-between mb-2';
+        headerDiv.innerHTML = `
+          <h2 class="text-white text-xl font-normal">${sectionName}</h2>
+          <button aria-label="Toggle ${sectionName} visibility" class="text-white text-xl">
+            <i class="fas fa-eye"></i>
+          </button>
+        `;
+        
+        // Add separator
+        const separator = document.createElement('hr');
+        separator.className = 'border-gray-600 mb-4';
+        
+        // Create categories container
+        const categoriesContainer = document.createElement('div');
+        categoriesContainer.id = `${sectionName.toLowerCase().replace(/\s+/g, '')}Categories`;
+        categoriesContainer.className = 'grid grid-cols-4 gap-x-4 gap-y-6';
+        
+        // Add categories to container
+        categories.forEach(category => {
+          const categoryKey = category.name.toLowerCase().replace(/\s+/g, '_');
+          const categoryButton = document.createElement('button');
+          categoryButton.className = 'category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity';
+          categoryButton.setAttribute('data-category', categoryKey);
+          categoryButton.innerHTML = `
+            <div class="w-14 h-14 rounded-full ${category.color} flex items-center justify-center">
+              <i class="${category.icon} text-white text-xl ${category.color.includes('bg-gray-400') ? 'opacity-70' : ''}"></i>
+            </div>
+            <span class="text-white text-xs text-center">${category.name}</span>
+          `;
+          categoriesContainer.appendChild(categoryButton);
+        });
+        
+        // Assemble section
+        sectionDiv.appendChild(headerDiv);
+        sectionDiv.appendChild(separator);
+        sectionDiv.appendChild(categoriesContainer);
+        
+        // Insert after most frequent section
+        const mostFrequentSection = document.getElementById('mostFrequentSection');
+        if (mostFrequentSection) {
+          mostFrequentSection.parentNode.insertBefore(sectionDiv, mostFrequentSection.nextSibling);
+        }
+        
+        // Add event listener for toggle button
+        const toggleBtn = headerDiv.querySelector('button');
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.toggleSectionVisibility(toggleBtn);
+        });
+      }
+
+
+      renderCategorySection(containerId, categories) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = categories.map(category => {
+          const cat = this.categories[category];
+          if (!cat) return '';
+          
+          return `
+            <button class="category-selector flex flex-col items-center space-y-2 hover:opacity-80 transition-opacity" data-category="${category}">
+              <div class="w-14 h-14 rounded-full ${cat.color} flex items-center justify-center">
+                <i class="${cat.icon} text-white text-xl ${cat.color.includes('bg-gray-400') ? 'opacity-70' : ''}"></i>
+              </div>
+              <span class="text-white text-xs text-center">${cat.name}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      filterCategories(searchTerm) {
+        const term = searchTerm.toLowerCase();
+        
+        // Get all sections dynamically
+        const allSections = document.querySelectorAll('[id$="Section"]');
+        
+        allSections.forEach(section => {
+          const categoryButtons = section.querySelectorAll('.category-selector');
+          
+          let hasVisibleCategories = false;
+          categoryButtons.forEach(button => {
+            const categoryName = button.querySelector('span').textContent.toLowerCase();
+            const isVisible = categoryName.includes(term);
+            button.style.display = isVisible ? 'flex' : 'none';
+            if (isVisible) hasVisibleCategories = true;
+          });
+          
+          // Show/hide entire section based on whether it has visible categories
+          section.style.display = hasVisibleCategories ? 'block' : 'none';
+        });
+      }
+
+      toggleSectionVisibility(button) {
+        // Find the section that contains this button
+        const section = button.closest('.mb-6');
+        if (!section) return;
+        
+        // Find the categories container within this section
+        const categoriesContainer = section.querySelector('[id$="Categories"]');
+        if (!categoriesContainer) return;
+        
+        // Toggle visibility
+        const isVisible = categoriesContainer.style.display !== 'none';
+        
+        if (isVisible) {
+          // Hide the categories
+          categoriesContainer.style.display = 'none';
+          // Change icon to closed eye
+          const icon = button.querySelector('i');
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          // Show the categories
+          categoriesContainer.style.display = '';
+          // Change icon to open eye
+          const icon = button.querySelector('i');
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+
+      selectCategory(categoryKey) {
+        // Get the full category object
+        const category = this.categories[categoryKey];
+        
+        if (!category) {
+          // Try to find by name instead of key
+          const foundByName = Object.values(this.categories).find(cat => 
+            cat.name.toLowerCase().replace(/\s+/g, '_') === categoryKey
+          );
+          if (foundByName) {
+            localStorage.setItem('selectedCategory', foundByName.name);
+            window.location.href = '2.html';
+            return;
+          }
+          return;
+        }
+        
+        // Save selected category name to localStorage (not the key)
+        localStorage.setItem('selectedCategory', category.name);
+        
+        // Go back to transaction form
+        window.location.href = '2.html';
+      }
+    }
+
+    // Function to navigate to edit categories page
+    function editCategories() {
+      try {
+        // Try different navigation methods
+        if (window.location.protocol === 'file:') {
+          // If running from file system, use window.open
+          window.open('5.html', '_self');
+        } else {
+          // If running from server, use location.href
+          window.location.href = '5.html';
+        }
+      } catch (error) {
+        console.error('Error navigating to edit categories:', error);
+      }
+    }
+
+    // Global variable to store category selector instance
+    let categorySelectorInstance;
+
+    // Function to refresh categories when returning from edit page
+    function refreshCategories() {
+      if (categorySelectorInstance) {
+        // Clear current categories
+        categorySelectorInstance.categories = {};
+        // Reload from storage (or defaults)
+        categorySelectorInstance.loadCategoriesFromStorage();
+        // Re-render all categories
+        categorySelectorInstance.renderAllCategories();
+      }
+    }
+
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      categorySelectorInstance = new CategorySelector();
+      
+      // Refresh categories when page becomes visible (returning from edit page)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          refreshCategories();
+        }
+      });
+    });
+
+    // Function to go back
+    function goBack() {
+      try {
+        console.log('🔙 Intentando regresar desde categories...');
+        console.log('📊 Historial del navegador:', window.history.length);
+        
+        if (window.history.length > 1) {
+          console.log('⬅️ Usando history.back()');
+          window.history.back();
+        } else {
+          // If no history, go to main page
+          console.log('🏠 Yendo a página principal');
+          window.location.href = '1.html';
+        }
+      } catch (error) {
+        console.error('❌ Error going back:', error);
+        // Fallback: go to main page
+        window.location.href = '1.html';
+      }
+    }
+  </script>
+</body>
+</html>

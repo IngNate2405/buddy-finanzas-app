@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   New Transaction
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+ </head>
+ <body class="bg-[#262E31] text-white min-h-screen flex flex-col items-center justify-start pt-20">
+  <!-- Status bar simulation -->
+  <div class="fixed top-0 left-0 right-0 bg-black h-14 flex items-center justify-between px-5 text-white text-sm font-semibold z-50">
+   <div>
+    21:15
+   </div>
+   <div class="flex items-center space-x-2">
+    <i class="fas fa-signal">
+    </i>
+    <i class="fas fa-wifi">
+    </i>
+    <div class="w-5 h-3 border border-white rounded-[3px] relative flex items-center justify-center">
+     <div class="w-3 h-1.5 bg-red-600 rounded-sm">
+     </div>
+    </div>
+   </div>
+  </div>
+  <!-- Modal container -->
+  <div class="w-full max-w-md rounded-xl overflow-hidden" style="background-color:#262E31;">
+   <!-- Header -->
+   <div class="px-6 pt-6 pb-4 flex items-center justify-center relative border-b border-[#1B2123]">
+    <button aria-label="Close" class="absolute left-6 top-6 text-gray-400 hover:text-white text-xl">
+     <i class="fas fa-times">
+     </i>
+    </button>
+    <h2 class="text-xs tracking-widest text-gray-400 uppercase font-semibold">
+     New Transaction
+    </h2>
+   </div>
+   <!-- Amount -->
+   <div class="flex justify-center items-baseline py-6">
+    <span class="text-2xl font-semibold mr-2">
+     Q
+    </span>
+    <span class="text-6xl font-semibold leading-none">
+     21
+    </span>
+   </div>
+   <!-- Tabs -->
+   <div class="flex justify-center space-x-10 pb-6 border-b border-[#1B2123] text-xs font-semibold tracking-widest">
+    <button class="bg-[#12191B] rounded-full px-6 py-2 text-white">
+     Expense
+    </button>
+    <button class="text-gray-400">
+     Income
+    </button>
+    <button class="text-gray-400">
+     Transfer
+    </button>
+   </div>
+   <!-- Category section -->
+   <div class="flex items-center space-x-4 px-6 py-4 border-b border-[#1B2123] bg-[#1B2123]">
+    <div class="w-10 h-10 bg-gray-500 rounded flex items-center justify-center opacity-50">
+     <i class="fas fa-box text-white text-lg">
+     </i>
+    </div>
+    <p class="text-gray-400 text-sm">
+     Category:
+     <span class="font-semibold text-white">
+      Miscellaneous
+     </span>
+    </p>
+   </div>
+   <!-- Search and icons -->
+   <div class="px-6 py-4">
+    <div class="flex items-center space-x-4 mb-4">
+     <div class="flex items-center space-x-2 bg-[#262E31] rounded-full px-4 py-2 flex-grow">
+      <i class="fas fa-search text-white text-lg">
+      </i>
+      <input aria-label="Quick search" class="bg-transparent placeholder-gray-600 text-gray-400 text-lg focus:outline-none flex-grow" placeholder="Quick search" type="text"/>
+     </div>
+     <button aria-label="Grid view" class="w-10 h-10 bg-[#12191B] rounded-full flex items-center justify-center text-white text-xl">
+      <i class="fas fa-th">
+      </i>
+     </button>
+     <button aria-label="Dropdown" class="w-10 h-10 bg-[#12191B] rounded-full flex items-center justify-center text-white text-xl">
+      <i class="fas fa-chevron-down">
+      </i>
+     </button>
+    </div>
+    <!-- Categories icons row -->
+    <div class="flex justify-between">
+     <button class="flex flex-col items-center space-y-2 focus:outline-none">
+      <div class="w-16 h-16 rounded-full bg-purple-700 flex items-center justify-center shadow-[0_0_10px_#9B4DFF]">
+       <i class="fas fa-gas-pump text-white text-2xl">
+       </i>
+      </div>
+      <span class="text-xs text-white font-semibold">
+       Gas
+      </span>
+     </button>
+     <button class="flex flex-col items-center space-y-2 focus:outline-none">
+      <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center">
+       <img alt="Icon of groceries with shopping bags in white on blue circle" class="w-6 h-6" height="24" src="https://storage.googleapis.com/a1aa/image/815b0acf-2c9c-4e0e-b1ff-18cdb411cdd3.jpg" width="24"/>
+      </div>
+      <span class="text-xs text-white font-semibold">
+       Groceries
+      </span>
+     </button>
+     <button class="flex flex-col items-center space-y-2 focus:outline-none">
+      <div class="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center opacity-50">
+       <i class="fas fa-box text-white text-2xl">
+       </i>
+      </div>
+      <span class="text-xs text-white font-semibold">
+       Miscellaneous
+      </span>
+     </button>
+     <button class="flex flex-col items-center space-y-2 focus:outline-none">
+      <div class="w-16 h-16 rounded-full bg-orange-400 flex items-center justify-center">
+       <img alt="Icon of a bank building with dollar sign in white on orange circle" class="w-6 h-6" height="24" src="https://storage.googleapis.com/a1aa/image/37ac1212-39a2-4f95-0f88-4f4cd1105174.jpg" width="24"/>
+      </div>
+      <span class="text-xs text-white font-semibold">
+       Rent
+      </span>
+     </button>
+    </div>
+    <!-- Browse all categories button -->
+    <button class="mt-6 w-full bg-[#12191B] rounded-lg py-3 text-center font-semibold text-white" type="button">
+     Browse all categories
+    </button>
+   </div>
+  </div>
+ </body>
+</html>

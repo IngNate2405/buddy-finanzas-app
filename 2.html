@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>New Transaction</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body class="bg-[#232B2E] text-white min-h-screen flex flex-col items-center justify-start pt-20">
+  <!-- Container -->
+  <div class="w-full max-w-md rounded-t-3xl bg-[#2A3134]">
+    <!-- Header -->
+    <div class="flex items-center justify-center relative border-b border-[#1B1F20] py-5">
+      <button id="closeBtn" aria-label="Close" class="absolute left-5 text-white opacity-60 hover:opacity-100">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+      <button id="clearCacheBtn" aria-label="Clear Cache" class="absolute right-5 text-white opacity-60 hover:opacity-100" title="Limpiar Cache">
+        <i class="fas fa-broom text-xl"></i>
+      </button>
+      <div class="flex flex-col items-center">
+        <h2 id="transactionTitle" class="text-xs tracking-widest uppercase font-normal text-white opacity-70">
+          New Transaction
+        </h2>
+        <span class="text-xs text-gray-500">v2.3.4</span>
+      </div>
+    </div>
+
+    <!-- Amount and tabs -->
+    <div class="flex flex-col items-center py-8 space-y-6">
+      <div id="amountDisplay" class="flex items-center space-x-2 text-white text-6xl font-light cursor-pointer">
+        <span class="text-3xl font-semibold">Q</span>
+        <span id="amountValue">0</span>
+      </div>
+      <div class="flex space-x-10 text-xs font-normal tracking-widest uppercase text-white opacity-70">
+        <button id="expenseTab" class="bg-[#121616] rounded-full px-6 py-2 tracking-widest font-semibold">
+          Expense
+        </button>
+        <button id="incomeTab" class="hover:opacity-80">Income</button>
+        <button id="transferTab" class="hover:opacity-80">Transfer</button>
+      </div>
+    </div>
+
+    <!-- Form fields -->
+    <div class="flex flex-col divide-y divide-[#1B1F20]">
+      <!-- Category -->
+      <div id="categoryDisplay" class="flex items-center space-x-4 px-6 py-4 opacity-70 cursor-pointer hover:opacity-100 transition-opacity">
+        <div id="categoryIcon" class="w-10 h-10 rounded-full bg-[#7B7B7B] flex items-center justify-center">
+          <i class="fas fa-box text-[#B0B0B0]"></i>
+        </div>
+        <p class="text-sm">
+          Category: <span id="categoryName" class="font-semibold opacity-90">Miscellaneous</span>
+        </p>
+      </div>
+
+      <!-- From/To -->
+      <div id="fromToSection" class="flex items-center justify-between px-6 py-4 opacity-70 border-t border-[#1B1F20]">
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 rounded-full bg-[#9B2B2B] flex items-center justify-center">
+            <i class="fas fa-piggy-bank text-[#D9D9D9]"></i>
+          </div>
+          <p class="text-sm">
+            <span id="fromToLabel">From:</span> <span class="font-semibold opacity-90">Ahorros - GYT</span>
+          </p>
+        </div>
+        <button aria-label="Switch" class="w-10 h-10 rounded-full bg-[#121616] flex items-center justify-center opacity-80 hover:opacity-100">
+          <i class="fas fa-exchange-alt text-white"></i>
+        </button>
+      </div>
+
+      <!-- Note -->
+      <div class="flex items-center space-x-4 px-6 py-4 border-t border-[#1B1F20]">
+        <i class="fas fa-clipboard-list text-xl text-white opacity-70"></i>
+        <div class="flex-1">
+          <input 
+            id="noteInput" 
+            type="text" 
+            placeholder="Add a note..." 
+            class="w-full bg-transparent text-white placeholder-gray-400 text-sm focus:outline-none"
+            value=""
+          />
+        </div>
+      </div>
+
+      <!-- Date -->
+      <div id="dateSection" class="flex items-center justify-between px-6 py-4 opacity-70 border-t border-[#1B1F20] cursor-pointer hover:opacity-100 transition-opacity">
+        <div class="flex items-center space-x-4">
+          <i class="fas fa-calendar-alt text-xl"></i>
+          <p class="text-sm">
+            <span id="dateText">Today</span>
+          </p>
+        </div>
+        <div class="flex items-center space-x-6 text-white opacity-70">
+          <button id="prevDateBtn" aria-label="Previous day" class="text-2xl font-light hover:opacity-100 transition-opacity">&lt;</button>
+          <button id="nextDateBtn" aria-label="Next day" class="text-2xl font-light hover:opacity-100 transition-opacity">&gt;</button>
+        </div>
+      </div>
+
+      <!-- Repeat -->
+      <div class="flex items-center space-x-4 px-6 py-4 opacity-40 border-t border-[#1B1F20]">
+        <i class="fas fa-sync-alt text-xl"></i>
+        <p class="text-sm">Never repeat</p>
+      </div>
+    </div>
+
+    <!-- Choose category button -->
+    <div id="categorySection" class="flex items-center justify-between bg-[#121616] rounded-full mx-6 my-6 px-6 py-3" style="display: none;">
+      <button id="chooseCategoryBtn" class="text-xs tracking-widest uppercase font-normal text-white opacity-70 w-full text-center">
+        Choose Category
+      </button>
+      <button id="expandCategoryBtn" aria-label="Expand category" class="w-10 h-10 rounded-full bg-[#121616] flex items-center justify-center opacity-70 hover:opacity-100">
+        <i class="fas fa-chevron-down text-white"></i>
+      </button>
+    </div>
+
+    <!-- Save button -->
+    <div class="flex justify-center mb-6">
+      <div class="flex items-center space-x-3 w-full max-w-md mx-6">
+        <button id="deleteTransactionBtn" class="bg-red-600 rounded-full px-6 py-3 text-white text-xs font-normal tracking-widest uppercase hover:bg-red-700 transition-colors opacity-70 flex-1" style="display: none;">
+          <i class="fas fa-trash mr-2"></i>
+          Delete
+        </button>
+        <button id="saveTransactionBtn" class="bg-[#121616] rounded-full px-6 py-3 text-white text-xs font-normal tracking-widest uppercase hover:bg-[#1a1a1a] transition-colors opacity-70 flex-1">
+          Save
+        </button>
+      </div>
+    </div>
+
+    <!-- Number pad -->
+    <div id="numberPad" class="grid grid-cols-3 gap-y-6 text-white text-2xl font-light text-center pb-10 select-none" style="display: none;">
+      <button class="number-btn" data-number="1">1</button>
+      <button class="number-btn" data-number="2">2</button>
+      <button class="number-btn" data-number="3">3</button>
+      <button class="number-btn" data-number="4">4</button>
+      <button class="number-btn" data-number="5">5</button>
+      <button class="number-btn" data-number="6">6</button>
+      <button class="number-btn" data-number="7">7</button>
+      <button class="number-btn" data-number="8">8</button>
+      <button class="number-btn" data-number="9">9</button>
+      <button class="decimal-btn" data-number=".">•</button>
+      <button class="number-btn" data-number="0">0</button>
+      <button id="backspaceBtn" aria-label="Backspace" class="opacity-70 hover:opacity-100">
+        <i class="fas fa-backspace"></i>
+      </button>
+    </div>
+
+    <!-- Calendar -->
+    <div id="calendar" class="mx-6 mb-6" style="display: none;">
+      <h3 class="text-white text-lg font-semibold mb-4">Transaction date</h3>
+      
+      <div class="bg-[#121616] rounded-lg p-4">
+        <div class="flex items-center justify-between mb-4">
+          <span id="calendarMonthYear" class="text-white text-sm cursor-pointer hover:text-gray-300 transition-colors">September 2025</span>
+          <div class="flex space-x-2">
+            <button id="prevMonthBtn" class="w-8 h-8 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-[#2a2a2a] transition-colors">
+              <i class="fas fa-chevron-left text-white text-xs"></i>
+            </button>
+            <button id="nextMonthBtn" class="w-8 h-8 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-[#2a2a2a] transition-colors">
+              <i class="fas fa-chevron-right text-white text-xs"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-7 gap-1 mb-2">
+          <div class="text-center text-gray-400 text-xs py-2">Sun</div>
+          <div class="text-center text-gray-400 text-xs py-2">Mon</div>
+          <div class="text-center text-gray-400 text-xs py-2">Tue</div>
+          <div class="text-center text-gray-400 text-xs py-2">Wed</div>
+          <div class="text-center text-gray-400 text-xs py-2">Thu</div>
+          <div class="text-center text-gray-400 text-xs py-2">Fri</div>
+          <div class="text-center text-gray-400 text-xs py-2">Sat</div>
+        </div>
+        
+        <div id="calendarDays" class="grid grid-cols-7 gap-1">
+          <!-- Calendar days will be generated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Month/Year Selector -->
+    <div id="monthYearSelector" class="mx-6 mb-6" style="display: none;">
+      <h3 class="text-white text-lg font-semibold mb-4">Select month and year</h3>
+      
+      <div class="bg-[#121616] rounded-2xl p-6">
+        <div class="flex justify-center">
+          <!-- Combined Month/Year Selector -->
+          <div class="flex bg-[#1a1a1a] rounded-2xl overflow-hidden border border-gray-700">
+            <!-- Month Selector -->
+            <div id="monthWheel" class="w-32 h-40 overflow-hidden relative cursor-grab active:cursor-grabbing select-none">
+              <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20 pointer-events-none z-10"></div>
+              <div id="monthWheelContent" class="transition-transform duration-75 ease-out">
+                <!-- Month options will be generated here -->
+              </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="w-px bg-gray-700"></div>
+            
+            <!-- Year Selector -->
+            <div id="yearWheel" class="w-24 h-40 overflow-hidden relative cursor-grab active:cursor-grabbing select-none">
+              <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20 pointer-events-none z-10"></div>
+              <div id="yearWheelContent" class="transition-transform duration-75 ease-out">
+                <!-- Year options will be generated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-center space-x-4 mt-6">
+          <button id="cancelMonthYear" class="px-6 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors">
+            Cancel
+          </button>
+          <button id="confirmMonthYear" class="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class TransactionForm {
+      constructor() {
+        this.currentAmount = this.getSavedAmount();
+        this.selectedCategory = this.getSelectedCategory();
+        this.transactionType = this.getSavedTransactionType();
+        this.currentMonth = this.getCurrentMonth();
+        this.editingTransactionId = this.getEditingTransactionId();
+        this.isEditMode = !!this.editingTransactionId;
+        this.currentNote = this.getSavedNote();
+        this.currentDate = this.getSavedDate();
+        this.activeInputType = null; // 'amount', 'note', 'date'
+        this.tempMonth = this.currentDate.getMonth();
+        this.tempYear = this.currentDate.getFullYear();
+        this.monthWheelOffset = 0;
+        this.yearWheelOffset = 0;
+        this.isSaving = false; // Flag to prevent double save
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.updateCategoryDisplay();
+        this.updateAmountDisplay();
+        this.selectTransactionType(this.transactionType);
+        
+        // Load transaction data if in edit mode
+        if (this.isEditMode) {
+          this.loadTransactionData().catch(error => {
+          });
+        }
+        
+        // Show/hide delete button based on mode
+        this.updateDeleteButtonVisibility();
+        
+        // Update From/To label based on current transaction type
+        this.updateFromToLabel(this.transactionType);
+        
+        // Update note and date displays
+        this.updateNoteDisplay();
+        this.updateDateDisplay();
+      }
+
+      updateCategoryDisplay() {
+        if (this.selectedCategory) {
+          const categoryInfo = this.getCategoryInfo(this.selectedCategory);
+          
+          // Update the category display section
+          const categoryIcon = document.getElementById('categoryIcon');
+          const categoryName = document.getElementById('categoryName');
+          
+          // Update icon
+          categoryIcon.className = `w-10 h-10 rounded-full ${categoryInfo.color} flex items-center justify-center`;
+          categoryIcon.innerHTML = `<i class="${categoryInfo.icon} text-white"></i>`;
+          
+          // Update name
+          categoryName.textContent = categoryInfo.name;
+          
+          // Update the choose category button (keep it as "Choose Category")
+          document.querySelector('#categorySection button').textContent = 'Choose Category';
+        }
+      }
+
+      getCategoryInfo(categoryName) {
+        // First try to get from localStorage (saved categories from 5.html)
+        const savedCategories = localStorage.getItem('categoriesData');
+        
+        if (savedCategories) {
+          const categoriesData = JSON.parse(savedCategories);
+          
+          // Search through all sections for the category
+          for (const [sectionName, categories] of Object.entries(categoriesData)) {
+            const foundCategory = categories.find(cat => cat.name === categoryName);
+            if (foundCategory) {
+              return {
+                name: foundCategory.name,
+                icon: foundCategory.icon,
+                color: foundCategory.color
+              };
+            }
+          }
+        }
+        
+        // If no categories found in localStorage, return Unknown
+        // This should only happen if localStorage is empty or corrupted
+        return { name: "Unknown", icon: "fas fa-question", color: "bg-gray-500" };
+      }
+
+      getCurrentMonth() {
+        // Get the current month from localStorage or default to September 2025
+        const savedMonth = localStorage.getItem('currentMonth');
+        return savedMonth ? JSON.parse(savedMonth) : { month: 8, year: 2025 };
+      }
+
+      getSelectedCategory() {
+        // Get selected category from localStorage
+        const category = localStorage.getItem('selectedCategory') || null;
+        return category;
+      }
+
+      getSavedAmount() {
+        // Get saved amount from localStorage
+        return localStorage.getItem('savedAmount') || '0';
+      }
+
+      getSavedTransactionType() {
+        // Get saved transaction type from localStorage
+        return localStorage.getItem('savedTransactionType') || 'expense';
+      }
+
+      getEditingTransactionId() {
+        // Get editing transaction ID from localStorage
+        return localStorage.getItem('editingTransactionId') || null;
+      }
+
+      getSavedNote() {
+        // Get saved note from localStorage
+        return localStorage.getItem('savedNote') || '';
+      }
+
+      getSavedDate() {
+        // Get saved date from localStorage or default to today
+        const savedDate = localStorage.getItem('savedDate');
+        if (savedDate) {
+          // Parse ISO string and create date in local timezone
+          const date = new Date(savedDate);
+          return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0);
+        }
+        return new Date();
+      }
+
+      saveNote() {
+        // Save current note to localStorage
+        localStorage.setItem('savedNote', this.currentNote);
+      }
+
+      saveDate() {
+        // Save current date to localStorage as ISO string
+        localStorage.setItem('savedDate', this.currentDate.toISOString());
+      }
+
+      formatDateForStorage(date) {
+        // Format date as YYYY-MM-DD in local timezone
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+
+      saveAmount() {
+        // Save current amount to localStorage
+        localStorage.setItem('savedAmount', this.currentAmount);
+      }
+
+      saveTransactionType() {
+        // Save current transaction type to localStorage
+        localStorage.setItem('savedTransactionType', this.transactionType);
+      }
+
+      async loadTransactionData() {
+        try {
+          // Get the transaction to edit from Firebase
+          const firebaseService = new window.FirebaseService();
+          const transactions = await firebaseService.loadTransactions();
+          const transaction = transactions.find(t => t.id == this.editingTransactionId);
+          
+          if (transaction) {
+            // Change title to "Edit Transaction"
+            const titleElement = document.getElementById('transactionTitle');
+            if (titleElement) {
+              titleElement.textContent = 'Edit Transaction';
+            }
+            
+            // Load transaction data
+            this.currentAmount = transaction.amount.toString();
+            this.selectedCategory = transaction.category;
+            this.transactionType = transaction.type || 'expense';
+            
+            // Load date if available
+            if (transaction.date) {
+              // Parse date string and create in local timezone
+              const dateParts = transaction.date.split('-');
+              const year = parseInt(dateParts[0]);
+              const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed
+              const day = parseInt(dateParts[2]);
+              this.currentDate = new Date(year, month, day, 12, 0, 0, 0);
+            }
+            
+            // Load note if available
+            if (transaction.note) {
+              this.currentNote = transaction.note;
+            }
+            
+            // Update the display
+            this.updateAmountDisplay();
+            this.updateCategoryDisplay();
+            this.selectTransactionType(this.transactionType);
+            this.updateDateDisplay();
+            this.updateNoteDisplay();
+            
+          } else {
+            // Clear editing mode if transaction not found
+            localStorage.removeItem('editingTransactionId');
+            this.isEditMode = false;
+            this.editingTransactionId = null;
+            
+            // Ensure title is "New Transaction" for new transactions
+            const titleElement = document.getElementById('transactionTitle');
+            if (titleElement) {
+              titleElement.textContent = 'New Transaction';
+            }
+          }
+        } catch (error) {
+          // Clear editing mode on error
+          localStorage.removeItem('editingTransactionId');
+          this.isEditMode = false;
+          this.editingTransactionId = null;
+          
+          // Ensure title is "New Transaction" for new transactions
+          const titleElement = document.getElementById('transactionTitle');
+          if (titleElement) {
+            titleElement.textContent = 'New Transaction';
+          }
+        }
+      }
+
+      updateDeleteButtonVisibility() {
+        const deleteBtn = document.getElementById('deleteTransactionBtn');
+        const categorySection = document.getElementById('categorySection');
+        
+        if (this.isEditMode) {
+          // Show delete button only if sections are closed
+          if (categorySection.style.display === 'none' || categorySection.style.display === '') {
+            deleteBtn.style.display = 'block';
+          } else {
+            deleteBtn.style.display = 'none';
+          }
+        } else {
+          deleteBtn.style.display = 'none';
+        }
+      }
+
+      bindEvents() {
+        // Close button
+        document.getElementById('closeBtn').addEventListener('click', () => {
+          this.goBackToMain();
+        });
+
+        // Clear cache button
+        document.getElementById('clearCacheBtn').addEventListener('click', () => {
+          clearAllCache();
+        });
+
+        // Amount display click
+        document.getElementById('amountDisplay').addEventListener('click', () => {
+          this.toggleInputSections();
+        });
+
+        // Transaction type tabs
+        document.getElementById('expenseTab').addEventListener('click', () => {
+          this.selectTransactionType('expense');
+        });
+
+        document.getElementById('incomeTab').addEventListener('click', () => {
+          this.selectTransactionType('income');
+        });
+
+        document.getElementById('transferTab').addEventListener('click', () => {
+          this.selectTransactionType('transfer');
+        });
+
+        // Choose category button (only the text part)
+        document.getElementById('chooseCategoryBtn').addEventListener('click', () => {
+          this.chooseCategory();
+        });
+
+        // Category display section (clickable)
+        document.getElementById('categoryDisplay').addEventListener('click', () => {
+          this.chooseCategory();
+        });
+
+        // Expand category button (arrow) - toggles number pad
+        document.getElementById('expandCategoryBtn').addEventListener('click', () => {
+          this.toggleNumberPad();
+        });
+
+        // Save transaction button
+        document.getElementById('saveTransactionBtn').addEventListener('click', async () => {
+          await this.saveTransaction();
+        });
+
+        document.getElementById('deleteTransactionBtn').addEventListener('click', async () => {
+          await this.deleteTransaction();
+        });
+
+        // Number pad buttons
+        document.querySelectorAll('.number-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            this.addNumber(e.target.dataset.number);
+          });
+        });
+
+        // Decimal button
+        document.querySelector('.decimal-btn').addEventListener('click', () => {
+          this.addDecimal();
+        });
+
+        // Backspace button
+        document.getElementById('backspaceBtn').addEventListener('click', () => {
+          this.removeLastDigit();
+        });
+
+        // Note input change
+        document.getElementById('noteInput').addEventListener('input', (e) => {
+          this.currentNote = e.target.value;
+          this.saveNote();
+        });
+
+        // Date section click
+        document.getElementById('dateSection').addEventListener('click', () => {
+          this.toggleDateInput();
+        });
+
+        // Date navigation buttons
+        document.getElementById('prevDateBtn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.previousDate();
+        });
+
+        document.getElementById('nextDateBtn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.nextDate();
+        });
+
+        // Calendar navigation
+        document.getElementById('prevMonthBtn').addEventListener('click', () => {
+          this.previousCalendarMonth();
+        });
+
+        document.getElementById('nextMonthBtn').addEventListener('click', () => {
+          this.nextCalendarMonth();
+        });
+
+        // Month/Year selector
+        document.getElementById('calendarMonthYear').addEventListener('click', () => {
+          this.showMonthYearSelector();
+        });
+
+        document.getElementById('cancelMonthYear').addEventListener('click', () => {
+          this.hideMonthYearSelector();
+        });
+
+        document.getElementById('confirmMonthYear').addEventListener('click', () => {
+          this.confirmMonthYearSelection();
+        });
+
+        // Month wheel events
+        document.getElementById('monthWheel').addEventListener('wheel', (e) => {
+          e.preventDefault();
+          this.scrollMonthWheel(e.deltaY);
+        });
+
+        // Year wheel events
+        document.getElementById('yearWheel').addEventListener('wheel', (e) => {
+          e.preventDefault();
+          this.scrollYearWheel(e.deltaY);
+        });
+
+        // Mouse drag events for desktop
+        document.getElementById('monthWheel').addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          this.monthMouseDown = true;
+          this.monthMouseStartY = e.clientY;
+          this.monthLastMouseY = e.clientY;
+        });
+
+        document.getElementById('monthWheel').addEventListener('mousemove', (e) => {
+          if (this.monthMouseDown) {
+            e.preventDefault();
+            const deltaY = this.monthLastMouseY - e.clientY;
+            
+            // Remove threshold - respond to any movement
+            if (Math.abs(deltaY) > 0) {
+              this.scrollMonthWheel(deltaY);
+              this.monthLastMouseY = e.clientY;
+            }
+          }
+        });
+
+        document.getElementById('monthWheel').addEventListener('mouseup', (e) => {
+          e.preventDefault();
+          this.monthMouseDown = false;
+        });
+
+        document.getElementById('monthWheel').addEventListener('mouseleave', (e) => {
+          e.preventDefault();
+          this.monthMouseDown = false;
+        });
+
+        document.getElementById('yearWheel').addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          this.yearMouseDown = true;
+          this.yearMouseStartY = e.clientY;
+          this.yearLastMouseY = e.clientY;
+        });
+
+        document.getElementById('yearWheel').addEventListener('mousemove', (e) => {
+          if (this.yearMouseDown) {
+            e.preventDefault();
+            const deltaY = this.yearLastMouseY - e.clientY;
+            
+            // Remove threshold - respond to any movement
+            if (Math.abs(deltaY) > 0) {
+              this.scrollYearWheel(deltaY);
+              this.yearLastMouseY = e.clientY;
+            }
+          }
+        });
+
+        document.getElementById('yearWheel').addEventListener('mouseup', (e) => {
+          e.preventDefault();
+          this.yearMouseDown = false;
+        });
+
+        document.getElementById('yearWheel').addEventListener('mouseleave', (e) => {
+          e.preventDefault();
+          this.yearMouseDown = false;
+        });
+
+        // Add touch events for continuous scrolling
+        document.getElementById('monthWheel').addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          this.monthTouchStart = e.touches[0].clientY;
+          this.monthTouchStartTime = Date.now();
+          this.monthLastTouchY = e.touches[0].clientY;
+          this.monthScrollInterval = null;
+        });
+
+        document.getElementById('monthWheel').addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          if (this.monthTouchStart !== null) {
+            const currentY = e.touches[0].clientY;
+            const deltaY = this.monthLastTouchY - currentY;
+            
+            // Remove threshold - respond to any movement
+            if (Math.abs(deltaY) > 0) {
+              this.scrollMonthWheel(deltaY);
+              this.monthLastTouchY = currentY;
+            }
+          }
+        });
+
+        document.getElementById('monthWheel').addEventListener('touchend', (e) => {
+          e.preventDefault();
+          if (this.monthScrollInterval) {
+            clearInterval(this.monthScrollInterval);
+            this.monthScrollInterval = null;
+          }
+          this.monthTouchStart = null;
+        });
+
+        document.getElementById('yearWheel').addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          this.yearTouchStart = e.touches[0].clientY;
+          this.yearTouchStartTime = Date.now();
+          this.yearLastTouchY = e.touches[0].clientY;
+          this.yearScrollInterval = null;
+        });
+
+        document.getElementById('yearWheel').addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          if (this.yearTouchStart !== null) {
+            const currentY = e.touches[0].clientY;
+            const deltaY = this.yearLastTouchY - currentY;
+            
+            // Remove threshold - respond to any movement
+            if (Math.abs(deltaY) > 0) {
+              this.scrollYearWheel(deltaY);
+              this.yearLastTouchY = currentY;
+            }
+          }
+        });
+
+        document.getElementById('yearWheel').addEventListener('touchend', (e) => {
+          e.preventDefault();
+          if (this.yearScrollInterval) {
+            clearInterval(this.yearScrollInterval);
+            this.yearScrollInterval = null;
+          }
+          this.yearTouchStart = null;
+        });
+
+      }
+
+      toggleInputSections() {
+        this.activeInputType = 'amount';
+        this.showInputSections();
+      }
+
+      toggleNumberPad() {
+        // If number pad is already open, close it
+        if (this.activeInputType === 'amount') {
+          this.hideInputSections();
+        } else {
+          // Open number pad
+          this.activeInputType = 'amount';
+          this.showInputSections();
+        }
+      }
+
+      selectTransactionType(type) {
+        this.transactionType = type;
+        this.saveTransactionType();
+        
+        // Update visual selection
+        const expenseTab = document.getElementById('expenseTab');
+        const incomeTab = document.getElementById('incomeTab');
+        const transferTab = document.getElementById('transferTab');
+        
+        // Reset all tabs
+        expenseTab.className = 'hover:opacity-80';
+        incomeTab.className = 'hover:opacity-80';
+        transferTab.className = 'hover:opacity-80';
+        
+        // Set active tab
+        if (type === 'expense') {
+          expenseTab.className = 'bg-[#121616] rounded-full px-6 py-2 tracking-widest font-semibold';
+        } else if (type === 'income') {
+          incomeTab.className = 'bg-[#121616] rounded-full px-6 py-2 tracking-widest font-semibold';
+        } else if (type === 'transfer') {
+          transferTab.className = 'bg-[#121616] rounded-full px-6 py-2 tracking-widest font-semibold';
+        }
+
+        // Update From/To label based on transaction type
+        this.updateFromToLabel(type);
+      }
+
+      updateFromToLabel(type) {
+        const fromToLabel = document.getElementById('fromToLabel');
+        if (type === 'income') {
+          fromToLabel.textContent = 'To:';
+        } else {
+          fromToLabel.textContent = 'From:';
+        }
+      }
+
+      updateNoteDisplay() {
+        const noteInput = document.getElementById('noteInput');
+        if (noteInput) {
+          noteInput.value = this.currentNote || '';
+        }
+      }
+
+      updateDateDisplay() {
+        const dateText = document.getElementById('dateText');
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (this.isSameDate(this.currentDate, today)) {
+          dateText.textContent = 'Today';
+        } else if (this.isSameDate(this.currentDate, yesterday)) {
+          dateText.textContent = 'Yesterday';
+        } else {
+          const options = { weekday: 'long', day: 'numeric', month: 'short' };
+          dateText.textContent = this.currentDate.toLocaleDateString('en-US', options);
+        }
+      }
+
+      isSameDate(date1, date2) {
+        return date1.getDate() === date2.getDate() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getFullYear() === date2.getFullYear();
+      }
+
+      chooseCategory() {
+        // Navigate to categories page
+        window.location.href = '4.html';
+      }
+
+      addNumber(number) {
+        if (this.currentAmount === '0') {
+          this.currentAmount = number;
+        } else {
+          this.currentAmount += number;
+        }
+        this.updateAmountDisplay();
+        this.saveAmount();
+      }
+
+      addDecimal() {
+        if (!this.currentAmount.includes('.')) {
+          this.currentAmount += '.';
+          this.updateAmountDisplay();
+          this.saveAmount();
+        }
+      }
+
+      removeLastDigit() {
+        if (this.currentAmount.length > 1) {
+          this.currentAmount = this.currentAmount.slice(0, -1);
+        } else {
+          this.currentAmount = '0';
+        }
+        this.updateAmountDisplay();
+        this.saveAmount();
+      }
+
+      updateAmountDisplay() {
+        document.getElementById('amountValue').textContent = this.currentAmount;
+      }
+
+
+      toggleDateInput() {
+        // If calendar is already open, close it
+        if (this.activeInputType === 'date') {
+          this.hideInputSections();
+        } else {
+          // Open calendar
+          this.activeInputType = 'date';
+          this.showInputSections();
+          this.generateCalendar();
+        }
+      }
+
+      showInputSections() {
+        const categorySection = document.getElementById('categorySection');
+        const numberPad = document.getElementById('numberPad');
+        const calendar = document.getElementById('calendar');
+        const monthYearSelector = document.getElementById('monthYearSelector');
+        const saveButton = document.getElementById('saveTransactionBtn');
+        const deleteButton = document.getElementById('deleteTransactionBtn');
+        const expandBtn = document.getElementById('expandCategoryBtn');
+        const icon = expandBtn.querySelector('i');
+
+        // Hide all input sections first
+        categorySection.style.display = 'none';
+        numberPad.style.display = 'none';
+        calendar.style.display = 'none';
+        monthYearSelector.style.display = 'none';
+
+        // Show appropriate section based on active input type
+        if (this.activeInputType === 'note') {
+          numberPad.style.display = 'grid';
+          categorySection.style.display = 'flex';
+        } else if (this.activeInputType === 'date') {
+          calendar.style.display = 'block';
+        } else {
+          numberPad.style.display = 'grid';
+          categorySection.style.display = 'flex';
+        }
+
+        // Hide buttons
+        saveButton.style.display = 'none';
+        if (this.isEditMode) {
+          deleteButton.style.display = 'none';
+        }
+
+        // Update expand button icon
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+      }
+
+      previousDate() {
+        this.currentDate.setDate(this.currentDate.getDate() - 1);
+        this.updateDateDisplay();
+        this.saveDate();
+      }
+
+      nextDate() {
+        this.currentDate.setDate(this.currentDate.getDate() + 1);
+        this.updateDateDisplay();
+        this.saveDate();
+      }
+
+
+      generateCalendar() {
+        const calendarDays = document.getElementById('calendarDays');
+        const calendarMonthYear = document.getElementById('calendarMonthYear');
+        
+        // Update month/year display
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        calendarMonthYear.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+        
+        // Generate calendar days
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDayOfWeek = firstDay.getDay();
+        
+        let calendarHTML = '';
+        
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < startingDayOfWeek; i++) {
+          calendarHTML += '<div class="h-8"></div>';
+        }
+        
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+          const isToday = this.isSameDate(new Date(year, month, day), new Date());
+          const isSelected = this.isSameDate(new Date(year, month, day), this.currentDate);
+          
+          let dayClass = 'h-8 flex items-center justify-center text-white text-sm cursor-pointer hover:bg-gray-700 rounded transition-colors';
+          if (isToday) dayClass += ' bg-blue-600';
+          if (isSelected) dayClass += ' bg-purple-600';
+          
+          calendarHTML += `<div class="${dayClass}" data-day="${day}" onclick="transactionForm.selectDate(${day})">${day}</div>`;
+        }
+        
+        calendarDays.innerHTML = calendarHTML;
+      }
+
+      selectDate(day) {
+        // Create date in local timezone to avoid timezone issues
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        this.currentDate = new Date(year, month, day, 12, 0, 0, 0); // Set to noon to avoid timezone issues
+        this.updateDateDisplay();
+        this.saveDate();
+        this.hideInputSections();
+      }
+
+      previousCalendarMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        this.generateCalendar();
+      }
+
+      nextCalendarMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        this.generateCalendar();
+      }
+
+      hideInputSections() {
+        const categorySection = document.getElementById('categorySection');
+        const numberPad = document.getElementById('numberPad');
+        const calendar = document.getElementById('calendar');
+        const monthYearSelector = document.getElementById('monthYearSelector');
+        const saveButton = document.getElementById('saveTransactionBtn');
+        const deleteButton = document.getElementById('deleteTransactionBtn');
+        const expandBtn = document.getElementById('expandCategoryBtn');
+        const icon = expandBtn.querySelector('i');
+
+        // Hide all sections
+        categorySection.style.display = 'none';
+        numberPad.style.display = 'none';
+        calendar.style.display = 'none';
+        monthYearSelector.style.display = 'none';
+
+        // Show buttons
+        saveButton.style.display = 'block';
+        if (this.isEditMode) {
+          deleteButton.style.display = 'block';
+        }
+
+        // Reset expand button icon
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+        
+        this.activeInputType = null;
+      }
+
+      showMonthYearSelector() {
+        const calendar = document.getElementById('calendar');
+        const monthYearSelector = document.getElementById('monthYearSelector');
+        
+        // Hide calendar, show selector
+        calendar.style.display = 'none';
+        monthYearSelector.style.display = 'block';
+        
+        // Initialize temp values
+        this.tempMonth = this.currentDate.getMonth();
+        this.tempYear = this.currentDate.getFullYear();
+        
+        // Generate wheels
+        this.generateMonthWheel();
+        this.generateYearWheel();
+      }
+
+      hideMonthYearSelector() {
+        const calendar = document.getElementById('calendar');
+        const monthYearSelector = document.getElementById('monthYearSelector');
+        
+        // Show calendar, hide selector
+        calendar.style.display = 'block';
+        monthYearSelector.style.display = 'none';
+      }
+
+      confirmMonthYearSelection() {
+        // Update current date with selected month/year
+        this.currentDate = new Date(this.tempYear, this.tempMonth, this.currentDate.getDate());
+        this.updateDateDisplay();
+        this.saveDate();
+        this.generateCalendar();
+        this.hideMonthYearSelector();
+      }
+
+      generateMonthWheel() {
+        const monthWheelContent = document.getElementById('monthWheelContent');
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        let monthHTML = '';
+        const itemHeight = 40; // Height of each item
+        
+        // Generate only 3 sets for better performance
+        for (let i = 0; i < 3; i++) {
+          monthNames.forEach((month, index) => {
+            const isSelected = index === this.tempMonth && i === 1; // Middle set
+            const className = isSelected ? 
+              'flex items-center justify-center h-10 text-white font-semibold text-sm cursor-pointer hover:opacity-100 transition-opacity' : 
+              'flex items-center justify-center h-10 text-gray-400 text-sm cursor-pointer hover:opacity-100 transition-opacity';
+            monthHTML += `<div class="${className}" data-month="${index}">${month}</div>`;
+          });
+        }
+        
+        monthWheelContent.innerHTML = monthHTML;
+        // Center on the middle set (index 1)
+        this.monthWheelOffset = -(1 * 12 * itemHeight) - (this.tempMonth * itemHeight);
+        monthWheelContent.style.transform = `translateY(${this.monthWheelOffset}px)`;
+        
+        // Add click event listeners to each month
+        monthWheelContent.querySelectorAll('[data-month]').forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const monthIndex = parseInt(item.getAttribute('data-month'));
+            this.tempMonth = monthIndex;
+            this.generateMonthWheel();
+          });
+        });
+      }
+
+      generateYearWheel() {
+        const yearWheelContent = document.getElementById('yearWheelContent');
+        const currentYear = new Date().getFullYear();
+        const years = [];
+        
+        // Generate years from 2020 to 2030
+        for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+          years.push(year);
+        }
+        
+        let yearHTML = '';
+        const itemHeight = 40; // Height of each item
+        
+        // Generate only 3 sets for better performance
+        for (let i = 0; i < 3; i++) {
+          years.forEach((year) => {
+            const isSelected = year === this.tempYear && i === 1; // Middle set
+            const className = isSelected ? 
+              'flex items-center justify-center h-10 text-white font-semibold text-sm cursor-pointer hover:opacity-100 transition-opacity' : 
+              'flex items-center justify-center h-10 text-gray-400 text-sm cursor-pointer hover:opacity-100 transition-opacity';
+            yearHTML += `<div class="${className}" data-year="${year}">${year}</div>`;
+          });
+        }
+        
+        yearWheelContent.innerHTML = yearHTML;
+        // Center on the middle set (index 1)
+        const yearIndex = years.indexOf(this.tempYear);
+        this.yearWheelOffset = -(1 * years.length * itemHeight) - (yearIndex * itemHeight);
+        yearWheelContent.style.transform = `translateY(${this.yearWheelOffset}px)`;
+        
+        // Add click event listeners to each year
+        yearWheelContent.querySelectorAll('[data-year]').forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const yearValue = parseInt(item.getAttribute('data-year'));
+            this.tempYear = yearValue;
+            this.generateYearWheel();
+          });
+        });
+      }
+
+      scrollMonthWheel(deltaY) {
+        // Calculate how many months to move based on deltaY
+        const sensitivity = 0.1; // Lower sensitivity for continuous movement
+        const monthsToMove = Math.round(deltaY * sensitivity);
+        
+        if (monthsToMove !== 0) {
+          this.tempMonth = (this.tempMonth + monthsToMove + 12) % 12;
+          
+          // Regenerate the wheel with new selection immediately
+          this.generateMonthWheel();
+        }
+      }
+
+      scrollYearWheel(deltaY) {
+        const currentYear = new Date().getFullYear();
+        
+        // Calculate how many years to move based on deltaY
+        const sensitivity = 0.1; // Lower sensitivity for continuous movement
+        const yearsToMove = Math.round(deltaY * sensitivity);
+        
+        if (yearsToMove !== 0) {
+          this.tempYear = Math.max(currentYear - 5, Math.min(currentYear + 5, this.tempYear + yearsToMove));
+          
+          // Regenerate the wheel with new selection immediately
+          this.generateYearWheel();
+        }
+      }
+
+      updateMonthWheelSelection() {
+        const monthWheelContent = document.getElementById('monthWheelContent');
+        const items = monthWheelContent.querySelectorAll('[data-month]');
+        
+        items.forEach((item, index) => {
+          const monthIndex = parseInt(item.getAttribute('data-month'));
+          const setIndex = Math.floor(index / 12);
+          const isSelected = monthIndex === this.tempMonth && setIndex === 2;
+          
+          if (isSelected) {
+            item.className = 'flex items-center justify-center h-10 text-white font-semibold text-sm';
+          } else {
+            item.className = 'flex items-center justify-center h-10 text-gray-400 text-sm';
+          }
+        });
+      }
+
+      updateYearWheelSelection() {
+        const yearWheelContent = document.getElementById('yearWheelContent');
+        const items = yearWheelContent.querySelectorAll('[data-year]');
+        const currentYear = new Date().getFullYear();
+        const years = [];
+        for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+          years.push(year);
+        }
+        
+        items.forEach((item, index) => {
+          const year = parseInt(item.getAttribute('data-year'));
+          const setIndex = Math.floor(index / years.length);
+          const isSelected = year === this.tempYear && setIndex === 2;
+          
+          if (isSelected) {
+            item.className = 'flex items-center justify-center h-10 text-white font-semibold text-sm';
+          } else {
+            item.className = 'flex items-center justify-center h-10 text-gray-400 text-sm';
+          }
+        });
+      }
+
+
+      async saveTransaction() {
+        if (this.currentAmount === '0') {
+          alert('Please enter an amount');
+          return;
+        }
+        
+        
+        try {
+          // Check if Firebase is available
+          if (!window.FirebaseService) {
+            alert('Error: Firebase no está disponible');
+            return;
+          }
+          
+          // Create or update transaction
+          const transaction = {
+            id: this.isEditMode ? this.editingTransactionId : Date.now(),
+            amount: parseFloat(this.currentAmount),
+            type: this.transactionType,
+            category: this.selectedCategory || 'miscellaneous',
+            date: this.currentDate.toISOString().split('T')[0],
+            note: this.currentNote || '',
+            month: this.currentDate.getMonth(),
+            year: this.currentDate.getFullYear()
+          };
+          
+          
+          // Save to Firebase
+          const firebaseService = new window.FirebaseService();
+          const existingTransactions = await firebaseService.loadTransactions();
+          
+          if (this.isEditMode) {
+            // Update existing transaction
+            const transactionIndex = existingTransactions.findIndex(t => t.id == this.editingTransactionId);
+            if (transactionIndex !== -1) {
+              existingTransactions[transactionIndex] = transaction;
+            } else {
+              alert('Error: No se pudo encontrar la transacción para actualizar');
+              return;
+            }
+          } else {
+            // Add new transaction
+            existingTransactions.push(transaction);
+          }
+          
+          await firebaseService.saveTransactions(existingTransactions);
+          
+          
+          // Reset form and go back to main page
+          this.resetForm();
+          window.location.href = '1.html';
+          
+        } catch (error) {
+          alert('Error guardando la transacción: ' + error.message);
+        }
+      }
+
+      async deleteTransaction() {
+        // Confirm deletion
+        if (!confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
+          return;
+        }
+
+        try {
+          // Check if Firebase is available
+          if (!window.FirebaseService) {
+            alert('Error: Firebase no está disponible');
+            return;
+          }
+
+          // Get current transactions from Firebase
+          const firebaseService = new window.FirebaseService();
+          const transactions = await firebaseService.loadTransactions();
+          
+          // Find and remove the transaction
+          const transactionIndex = transactions.findIndex(t => t.id == this.editingTransactionId);
+          
+          if (transactionIndex !== -1) {
+            transactions.splice(transactionIndex, 1);
+            
+            // Save updated transactions back to Firebase
+            await firebaseService.saveTransactions(transactions);
+            
+            // Clear editing mode
+            localStorage.removeItem('editingTransactionId');
+            
+            // Show success message and go back
+            alert('Transacción eliminada correctamente');
+            window.location.href = '1.html';
+          } else {
+            alert('No se pudo encontrar la transacción para eliminar');
+          }
+        } catch (error) {
+          alert('Error eliminando la transacción: ' + error.message);
+        }
+      }
+
+      resetForm() {
+        this.currentAmount = '0';
+        this.selectedCategory = null;
+        this.transactionType = 'expense'; // Reset to default
+        this.updateAmountDisplay();
+        
+        // Clear all saved data from localStorage
+        localStorage.removeItem('selectedCategory');
+        localStorage.removeItem('savedAmount');
+        localStorage.removeItem('savedTransactionType');
+        localStorage.removeItem('editingTransactionId');
+        localStorage.removeItem('savedNote');
+        localStorage.removeItem('savedDate');
+        
+        // Reset transaction type tabs
+        this.selectTransactionType('expense');
+        
+        // Reset category display section
+        const categoryIcon = document.getElementById('categoryIcon');
+        const categoryName = document.getElementById('categoryName');
+        
+        categoryIcon.className = 'w-10 h-10 rounded-full bg-[#7B7B7B] flex items-center justify-center';
+        categoryIcon.innerHTML = '<i class="fas fa-box text-[#B0B0B0]"></i>';
+        categoryName.textContent = 'Miscellaneous';
+        
+        // Reset category button text
+        document.querySelector('#categorySection button').textContent = 'Choose Category';
+        
+        // Hide sections
+        document.getElementById('categorySection').style.display = 'none';
+        document.getElementById('numberPad').style.display = 'none';
+        document.getElementById('saveTransactionBtn').style.display = 'block'; // Keep save button visible
+        
+        // Reset expand button icon
+        const expandBtn = document.getElementById('expandCategoryBtn');
+        const icon = expandBtn.querySelector('i');
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+        
+        // Reset edit mode
+        this.isEditMode = false;
+        this.editingTransactionId = null;
+        this.updateDeleteButtonVisibility();
+        
+        // Reset note and date
+        this.currentNote = '';
+        this.currentDate = new Date();
+        this.updateNoteDisplay();
+        this.updateDateDisplay();
+        
+        // Ensure save button is visible after reset
+        document.getElementById('saveTransactionBtn').style.display = 'block';
+      }
+
+      goBackToMain() {
+        // Reset form and go back to main page
+        this.resetForm();
+        window.location.href = '1.html';
+      }
+    }
+
+    // Clear all cache function
+    function clearAllCache() {
+      if (confirm('¿Estás seguro de que quieres limpiar todo el cache? Esto recargará la página.')) {
+        try {
+          // Clear localStorage
+          localStorage.clear();
+          
+          // Clear sessionStorage
+          sessionStorage.clear();
+          
+          // Clear service worker cache
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (let name of names) {
+                caches.delete(name);
+              }
+            });
+          }
+          
+          // Clear IndexedDB (if exists)
+          if ('indexedDB' in window) {
+            indexedDB.databases().then(databases => {
+              databases.forEach(db => {
+                indexedDB.deleteDatabase(db.name);
+              });
+            });
+          }
+          
+          // Show success message
+          alert('Cache limpiado correctamente. Recargando página...');
+          
+          // Force reload
+          setTimeout(() => {
+            location.reload(true);
+          }, 1000);
+          
+        } catch (error) {
+          alert('Error limpiando cache: ' + error.message);
+        }
+      }
+    }
+
+    // Initialize when page loads
+    let transactionForm;
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if user is logged in
+      const userEmail = localStorage.getItem('userEmail');
+      if (!userEmail) {
+        // User is not logged in, redirect to login
+        window.location.href = 'login-firebase.html';
+        return;
+      }
+      
+      transactionForm = new TransactionForm();
+    });
+  </script>
+</body>
+</html>

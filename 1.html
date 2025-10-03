@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Household Overview
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json">
+  <script type="module" src="firebase-config.js"></script>
+  <meta name="theme-color" content="#a64fff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Buddy Finanzas">
+  <style>
+   body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Hide scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Hide scrollbar for Firefox */
+    html {
+      scrollbar-width: none;
+    }
+  </style>
+ </head>
+ <body class="bg-[#0f1618] text-white min-h-screen flex flex-col">
+  <!-- Top bar -->
+  <header class="bg-gradient-to-r from-[#a64fff] to-[#8a2aff] p-4 flex items-center justify-between">
+   <div class="flex items-center">
+    <div class="flex flex-col">
+     <h1 class="text-white text-lg font-normal">
+      Overview:
+      <span class="font-bold">
+       My Household
+      </span>
+      <i class="fas fa-chevron-down ml-1">
+      </i>
+     </h1>
+           <span class="text-xs text-gray-400">v2.3.4</span>
+    </div>
+   </div>
+   <div class="flex items-center space-x-4">
+    <button id="logoutBtn" aria-label="Logout" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Cerrar Sesión">
+     <i class="fas fa-sign-out-alt">
+     </i>
+    </button>
+    <button id="whatsappBtn" aria-label="WhatsApp Settings" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Configuración WhatsApp" onclick="openWhatsAppSettings()">
+     <i class="fab fa-whatsapp">
+     </i>
+    </button>
+    <button id="clearCacheBtn" aria-label="Clear Cache" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Limpiar Cache">
+     <i class="fas fa-broom">
+     </i>
+    </button>
+    <button aria-label="Search" class="text-white text-2xl">
+     <i class="fas fa-search">
+     </i>
+    </button>
+   </div>
+  </header>
+  <!-- Navigation tabs -->
+   <nav class="bg-gradient-to-r from-[#a64fff] to-[#8a2aff] flex justify-center space-x-8 py-4 text-white uppercase tracking-widest font-semibold text-sm">
+    <button id="overviewBtn" class="opacity-70 hover:opacity-100 px-4 py-2 rounded-full transition-all duration-300" onclick="monthNavigator.switchToOverview()">
+     Overview
+    </button>
+    <button id="spendingBtn" class="opacity-70 hover:opacity-100 px-4 py-2 rounded-full transition-all duration-300" onclick="monthNavigator.switchToSpending()">
+     Spending
+    </button>
+    <button id="listBtn" class="opacity-70 hover:opacity-100 px-4 py-2 rounded-full transition-all duration-300" onclick="monthNavigator.switchToList()">
+     List
+    </button>
+   </nav>
+  <!-- Main content -->
+  <main class="flex-grow p-6">
+   <section class="bg-[#1f292c] rounded-3xl flex items-center justify-between max-w-xl mx-auto px-6 py-4 mb-6">
+    <button id="prevMonth" aria-label="Previous month" class="text-white text-2xl hover:opacity-70 transition-opacity">
+     <i class="fas fa-chevron-left">
+     </i>
+    </button>
+    <div class="text-center">
+     <h2 id="currentMonth" class="text-white text-lg font-semibold">
+      September 2025
+     </h2>
+     <p id="transactionCount" class="text-gray-400 text-xs tracking-widest mt-1">
+      0 TRANSACTIONS
+     </p>
+    </div>
+    <button id="nextMonth" aria-label="Next month" class="text-white text-2xl hover:opacity-70 transition-opacity">
+     <i class="fas fa-chevron-right">
+     </i>
+    </button>
+   </section>
+   <section id="financialSummary" class="bg-[#1f292c] rounded-3xl max-w-xl mx-auto p-6 space-y-6 transition-all duration-1000 ease-in-out transform" style="opacity: 0; transform: translateY(150px);">
+    <!-- Overview/List View - Traditional Summary -->
+    <div id="traditionalSummary" class="bg-[#121b1d] rounded-xl flex justify-around text-center py-4">
+     <div>
+      <p id="incomeAmount" class="text-white font-semibold text-lg">
+       Q 0
+      </p>
+      <p class="text-gray-500 text-xs tracking-widest mt-1">
+       INCOME
+      </p>
+     </div>
+     <div>
+      <p id="expensesAmount" class="text-white font-semibold text-lg">
+       Q 0
+      </p>
+      <p class="text-gray-500 text-xs tracking-widest mt-1">
+       EXPENSES
+      </p>
+     </div>
+     <div>
+      <p id="balanceAmount" class="text-white font-semibold text-lg">
+       Q 0
+      </p>
+      <p class="text-gray-500 text-xs tracking-widest mt-1">
+       BALANCE
+      </p>
+     </div>
+    </div>
+    
+    <!-- Spending View - Bar Chart Summary -->
+    <div id="spendingBarChart" class="bg-[#121b1d] rounded-xl p-6" style="display: none;">
+      <div class="relative h-40 flex items-end justify-around">
+        <!-- Grid lines -->
+        <div class="absolute inset-0 flex flex-col justify-between">
+          <div class="border-t border-dashed border-gray-600"></div>
+          <div class="border-t border-dashed border-gray-600"></div>
+          <div class="border-t border-dashed border-gray-600"></div>
+          <div class="border-t border-dashed border-gray-600"></div>
+        </div>
+        
+        <!-- Income Bar -->
+        <div class="flex flex-col items-center z-10">
+          <div id="incomeBar" class="bg-teal-500" style="height: 4px; width: 60px; border-radius: 25px 25px 0 0;"></div>
+        </div>
+        
+        <!-- Expenses Bar -->
+        <div class="flex flex-col items-center z-10">
+          <div id="expensesBar" class="bg-pink-500" style="height: 60px; width: 60px; border-radius: 25px 25px 0 0;"></div>
+        </div>
+        
+        <!-- Balance Bar -->
+        <div class="flex flex-col items-center z-10">
+          <div id="balanceBar" class="bg-purple-500" style="height: 4px; width: 60px; border-radius: 25px 25px 0 0;"></div>
+        </div>
+      </div>
+      
+      <!-- Labels below the chart area -->
+      <div class="flex justify-around mt-4">
+        <div class="flex flex-col items-center">
+          <div id="incomeBarText" class="text-white font-semibold text-lg">Q 0</div>
+          <div class="text-gray-500 text-xs tracking-widest mt-1">INCOME</div>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <div id="expensesBarText" class="text-white font-semibold text-lg">Q 0</div>
+          <div class="text-gray-500 text-xs tracking-widest mt-1">EXPENSES</div>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <div id="balanceBarText" class="text-white font-semibold text-lg">Q 0</div>
+          <div class="text-gray-500 text-xs tracking-widest mt-1">BALANCE</div>
+        </div>
+      </div>
+    </div>
+     <div id="listView">
+      <h3 id="todayHeader" class="font-bold text-white text-lg mb-2 flex items-center">
+       Today
+       <span class="flex-grow border-b border-dotted border-gray-600 mx-3">
+       </span>
+       <span id="todayTotal" class="text-gray-500 text-base font-normal">
+        Q 0
+       </span>
+      </h3>
+      <div id="transactionsContainer">
+       <!-- Transactions will be dynamically loaded here -->
+      </div>
+     </div>
+     <div id="spendingView" style="display: none;">
+      <!-- Expenses Breakdown -->
+      <div class="bg-[#121b1d] rounded-xl p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <button id="expensesIncomeToggle" class="flex items-center text-white font-semibold">
+            EXPENSES
+            <i class="fas fa-chevron-down ml-2 text-sm"></i>
+          </button>
+        </div>
+        
+        <!-- Donut Chart -->
+        <div class="flex items-center justify-center mb-6">
+          <div class="relative w-96 h-96">
+            <!-- SVG Donut Chart -->
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#2d3748" stroke-width="8"/>
+              <g id="donutSegments">
+                <!-- Los segmentos se crearán dinámicamente aquí -->
+              </g>
+            </svg>
+            
+            <!-- Center Content -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <div class="bg-blue-400 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+                <i class="fas fa-candy-cane text-white text-2xl"></i>
+              </div>
+              <div id="centerAmount" class="text-white font-bold text-4xl">Q 0</div>
+              <div id="centerCategory" class="text-gray-400 text-lg">NO TRANSACTIONS</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Category Tabs -->
+        <div class="flex mb-4">
+          <button id="headCategoriesTab" class="bg-[#1f292c] text-white px-4 py-2 rounded-l-lg text-sm font-medium">
+            HEAD CATEGORIES
+          </button>
+          <button id="categoriesTab" class="bg-[#2d3748] text-gray-400 px-4 py-2 text-sm font-medium">
+            CATEGORIES
+          </button>
+          <button id="editCategoriesBtn" onclick="editCategories()" class="bg-[#2d3748] text-gray-400 px-3 py-2 rounded-r-lg text-sm font-medium hover:bg-[#374151] transition-colors">
+            <i class="fas fa-pencil"></i>
+          </button>
+        </div>
+        
+        <!-- Categories List -->
+        <div id="categoriesList" class="space-y-3">
+          <!-- Categories will be dynamically loaded here -->
+        </div>
+      </div>
+     </div>
+   </section>
+  </main>
+  <!-- Floating add button -->
+  <button id="addTransactionBtn" aria-label="Add transaction" class="fixed bottom-24 right-6 bg-white text-black rounded-full w-16 h-16 flex items-center justify-center text-4xl font-thin shadow-lg hover:bg-gray-100 transition-colors">
+   +
+  </button>
+  <!-- Bottom navigation -->
+   <nav class="bg-[#1f292c] flex justify-around py-4 text-gray-500 text-xs font-normal tracking-wide">
+    <button id="footerOverviewBtn" class="flex flex-col items-center text-[#9b3fff]">
+     <i class="fas fa-eye text-2xl mb-1">
+     </i>
+     Overview
+    </button>
+    <button id="footerSpendingBtn" class="flex flex-col items-center opacity-50">
+     <i class="fas fa-chart-pie text-2xl mb-1">
+     </i>
+     Budget
+    </button>
+    <button class="flex flex-col items-center opacity-50">
+     <i class="fas fa-wallet text-2xl mb-1">
+     </i>
+     Wallets
+    </button>
+    <button class="flex flex-col items-center opacity-50">
+     <i class="fas fa-briefcase text-2xl mb-1">
+     </i>
+     Tools
+    </button>
+   </nav>
+
+  <script>
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // Month Navigation Functionality
+    class MonthNavigator {
+      constructor() {
+        this.currentDate = new Date(); // Use current date instead of September 2025
+        this.monthNames = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        this.activeCategoryTab = 'categories'; // Track active category tab
+        this.activeTransactionType = 'expense'; // Track active transaction type (expense/income)
+        
+        console.log('📅 Fecha actual configurada:', this.currentDate);
+        console.log('📅 Mes actual:', this.currentDate.getMonth(), 'Año:', this.currentDate.getFullYear());
+        
+        // Initialize asynchronously
+        this.init().catch(error => {
+          console.error('Error initializing MonthNavigator:', error);
+        });
+      }
+
+      async init() {
+        await this.updateDisplay();
+        this.bindEvents();
+        this.setupPageTransition();
+        this.restoreActiveView();
+      }
+
+      bindEvents() {
+        document.getElementById('prevMonth').addEventListener('click', () => {
+          this.previousMonth();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+          this.nextMonth();
+        });
+
+        document.getElementById('addTransactionBtn').addEventListener('click', () => {
+          this.saveCurrentMonth();
+          window.location.href = '2.html';
+        });
+
+        // Add event delegation for transaction clicks
+        document.addEventListener('click', (e) => {
+          if (e.target.closest('li[data-transaction-id]')) {
+            const transactionElement = e.target.closest('li[data-transaction-id]');
+            const transactionId = transactionElement.getAttribute('data-transaction-id');
+            this.editTransaction(transactionId);
+          }
+        });
+
+        // Add event listeners for category tabs
+        document.getElementById('headCategoriesTab').addEventListener('click', async () => {
+          await this.switchCategoryTab('head');
+        });
+
+        document.getElementById('categoriesTab').addEventListener('click', async () => {
+          await this.switchCategoryTab('categories');
+        });
+
+        // Add event listener for expenses/income toggle
+        document.getElementById('expensesIncomeToggle').addEventListener('click', async () => {
+          await this.toggleExpensesIncome();
+        });
+
+        // Add event listener for edit categories button
+        document.getElementById('editCategoriesBtn').addEventListener('click', () => {
+          editCategories();
+        });
+
+        // Add event listener for clear cache button
+        document.getElementById('clearCacheBtn').addEventListener('click', () => {
+          clearAllCache();
+        });
+
+        // Add event listener for logout button
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          handleLogout();
+        });
+      }
+
+      async previousMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        this.saveCurrentMonth();
+        await this.updateDisplay();
+      }
+
+      async nextMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        this.saveCurrentMonth();
+        await this.updateDisplay();
+      }
+
+      saveCurrentMonth() {
+        const monthData = {
+          month: this.currentDate.getMonth(),
+          year: this.currentDate.getFullYear()
+        };
+        localStorage.setItem('currentMonth', JSON.stringify(monthData));
+      }
+
+       async updateDisplay() {
+         console.log('🔄 Actualizando display completo...');
+         const monthName = this.monthNames[this.currentDate.getMonth()];
+         const year = this.currentDate.getFullYear();
+         
+         document.getElementById('currentMonth').textContent = `${monthName} ${year}`;
+         console.log('📅 Mes actual:', monthName, year);
+         
+         // Update transaction count, financial summary, and transactions display
+         await this.updateTransactionCount();
+         await this.updateFinancialSummary();
+         await this.updateTransactionsDisplay();
+         
+         // Update spending charts if we're in spending view
+         const spendingView = document.getElementById('spendingView');
+         if (spendingView && spendingView.style.display !== 'none') {
+           await this.updateSpendingCharts();
+         }
+         console.log('✅ Display actualizado completamente');
+       }
+
+
+      editTransaction(transactionId) {
+        // Save the transaction ID to edit in localStorage
+        localStorage.setItem('editingTransactionId', transactionId);
+        
+        // Navigate to edit page
+        window.location.href = '2.html';
+      }
+
+      async getTransactionsForMonth() {
+        const month = this.currentDate.getMonth();
+        const year = this.currentDate.getFullYear();
+        
+        try {
+          // Get transactions from Firebase
+          const firebaseService = new window.FirebaseService();
+          const savedTransactions = await firebaseService.loadTransactions();
+          console.log('💾 Transacciones en Firebase:', savedTransactions.length);
+        
+        // Filter transactions for current month/year
+        const monthTransactions = savedTransactions.filter(t => 
+          t.month === month && t.year === year
+        );
+          console.log('📅 Transacciones del mes actual:', monthTransactions.length);
+        
+        // Convert to display format
+          const displayTransactions = await Promise.all(monthTransactions.map(async (t, index) => {
+            console.log('🔍 Procesando transacción:', t.category, 'Tipo:', t.type);
+            const categoryInfo = await this.getCategoryInfo(t.category);
+          return {
+            id: t.id || `transaction_${month}_${year}_${index}`, // Add unique ID
+            name: categoryInfo.name,
+            category: categoryInfo.displayName,
+            amount: t.amount,
+            type: t.type || 'expense', // Default to expense if type is missing
+            icon: categoryInfo.icon,
+            color: categoryInfo.color,
+            date: t.date || new Date(year, month, 1).toISOString().split('T')[0] // Add date
+          };
+          }));
+        
+        return displayTransactions;
+        } catch (error) {
+          console.error('❌ Error cargando transacciones desde Firebase:', error);
+          return [];
+        }
+      }
+
+      async getCategoryInfo(category) {
+        try {
+          console.log('🔍 Buscando categoría:', category);
+          // Get categories from Firebase
+          const firebaseService = new window.FirebaseService();
+          const categoriesData = await firebaseService.loadCategories();
+          
+          console.log('📋 Categorías cargadas desde Firebase:', Object.keys(categoriesData || {}).length);
+          
+          if (categoriesData && Object.keys(categoriesData).length > 0) {
+          // Search through all sections for the category
+          for (const [sectionName, categories] of Object.entries(categoriesData)) {
+            const foundCategory = categories.find(cat => cat.name === category);
+            if (foundCategory) {
+                console.log('✅ Categoría encontrada:', foundCategory.name);
+              return {
+                name: foundCategory.name,
+                displayName: foundCategory.name,
+                icon: foundCategory.icon,
+                color: foundCategory.color
+              };
+            }
+          }
+            console.log('❌ Categoría no encontrada:', category);
+          } else {
+            console.log('❌ No hay categorías en Firebase');
+          }
+        } catch (error) {
+          console.error('❌ Error loading categories from Firebase:', error);
+        }
+        
+        // If no categories found, return Unknown
+        return { name: "Unknown", displayName: "Unknown", icon: "fas fa-question", color: "bg-gray-500" };
+      }
+
+      async updateTransactionCount() {
+        const transactions = await this.getTransactionsForMonth();
+        const count = transactions.length;
+        document.getElementById('transactionCount').textContent = `${count} TRANSACTION${count !== 1 ? 'S' : ''}`;
+      }
+
+      async updateFinancialSummary() {
+        // Get display transactions (which already have type information)
+        const displayTransactions = await this.getTransactionsForMonth();
+        
+        // Calculate totals
+        let income = 0;
+        let expenses = 0;
+        
+        displayTransactions.forEach(t => {
+          if (t.type === 'income') {
+            income += t.amount;
+          } else if (t.type === 'expense') {
+            expenses += t.amount;
+          }
+          // Transfer transactions don't affect income/expenses totals
+        });
+        
+        const balance = income - expenses;
+        
+        // Update the financial summary
+        document.getElementById('incomeAmount').textContent = `Q ${income}`;
+        document.getElementById('expensesAmount').textContent = `Q ${expenses}`;
+        document.getElementById('balanceAmount').textContent = `${balance >= 0 ? '' : '-'}Q ${Math.abs(balance)}`;
+      }
+
+      async updateTransactionsDisplay() {
+        console.log('🔄 Actualizando display de transacciones...');
+        const transactions = await this.getTransactionsForMonth();
+        console.log('📋 Transacciones para mostrar:', transactions.length);
+        console.log('📊 Transacciones:', transactions);
+        const container = document.getElementById('transactionsContainer');
+        
+        if (transactions.length === 0) {
+          // Show "No transactions" message
+          container.innerHTML = `
+            <div class="text-center py-8">
+              <div class="text-gray-400 text-lg font-semibold mb-2">No transactions .... yet</div>
+              <div class="text-gray-500 text-sm">Your transactions will be listed here, go ahead and add your first one!</div>
+            </div>
+          `;
+          
+          // Update today header
+          document.getElementById('todayHeader').style.display = 'none';
+        } else {
+          // Group transactions by date
+          const transactionsByDate = this.groupTransactionsByDate(transactions);
+          
+          // Get today's date for comparison (in local timezone)
+          const today = new Date();
+          const todayString = this.formatDateForStorage(today);
+          
+          // Hide today header initially
+          document.getElementById('todayHeader').style.display = 'none';
+          
+          // Generate HTML for each date group
+          const dateGroupsHTML = Object.keys(transactionsByDate)
+            .sort((a, b) => new Date(b) - new Date(a)) // Sort by date, newest first
+            .map(date => {
+              const dayTransactions = transactionsByDate[date];
+              const dayTotal = dayTransactions.reduce((sum, t) => {
+                return sum + (t.type === 'expense' ? -t.amount : t.amount);
+              }, 0);
+              
+              const dateLabel = this.formatDateLabel(date);
+              const totalLabel = dayTotal === 0 ? 'Q 0' : `${dayTotal > 0 ? '+' : '-'}Q ${Math.abs(dayTotal)}`;
+              
+              const transactionsHTML = dayTransactions.map(transaction => `
+                <li class="flex items-center justify-between group cursor-pointer hover:bg-gray-800 transition-colors rounded-lg p-2" 
+                    data-transaction-id="${transaction.id}">
+                  <div class="flex items-center space-x-4">
+                    <div class="${transaction.color} rounded-full w-10 h-10 flex items-center justify-center">
+                      <i class="${transaction.icon} text-white text-lg"></i>
+                    </div>
+                    <div>
+                      <p class="text-white font-semibold text-base leading-none">${transaction.name}</p>
+                    </div>
+                  </div>
+                  <p class="font-semibold text-lg ${transaction.type === 'income' ? 'text-green-400' : 'text-white'}">${transaction.type === 'income' ? '+' : ''}Q ${transaction.amount}</p>
+                </li>
+              `).join('');
+              
+              // If this is today, show the existing header and return only transactions
+              if (date === todayString) {
+                // Show and update the existing today header
+                document.getElementById('todayHeader').style.display = 'flex';
+                document.getElementById('todayTotal').textContent = totalLabel;
+                return `<ul class="space-y-4">${transactionsHTML}</ul>`;
+              } else {
+                // For other dates, create new header
+                return `
+                  <div class="mb-6">
+                    <h3 class="font-bold text-white text-lg mb-2 flex items-center">
+                      ${dateLabel}
+                      <span class="flex-grow border-b border-dotted border-gray-600 mx-3">
+                      </span>
+                      <span class="text-gray-500 text-base font-normal">
+                        ${totalLabel}
+                      </span>
+                    </h3>
+                    <ul class="space-y-4">
+                      ${transactionsHTML}
+                    </ul>
+                  </div>
+                `;
+              }
+            }).join('');
+          
+          container.innerHTML = dateGroupsHTML;
+        }
+      }
+
+      groupTransactionsByDate(transactions) {
+        const groups = {};
+        
+        transactions.forEach(transaction => {
+          // Get the date from the transaction (we'll need to add this to the transaction data)
+          // For now, we'll use a mock date or the current date
+          const transactionDate = transaction.date || new Date().toISOString().split('T')[0];
+          
+          if (!groups[transactionDate]) {
+            groups[transactionDate] = [];
+          }
+          groups[transactionDate].push(transaction);
+        });
+        
+        return groups;
+      }
+
+      formatDateLabel(dateString) {
+        // Parse the date string and create date in local timezone
+        const dateParts = dateString.split('-');
+        const year = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed
+        const day = parseInt(dateParts[2]);
+        const date = new Date(year, month, day, 12, 0, 0, 0);
+        
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // Reset time to compare only dates
+        const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const yesterdayOnly = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+        
+        if (dateOnly.getTime() === todayOnly.getTime()) {
+          return 'Today';
+        } else if (dateOnly.getTime() === yesterdayOnly.getTime()) {
+          return 'Yesterday';
+        } else {
+          // Format as "Weekday, DD Mon" (e.g., "Wednesday, 10 Sep")
+          const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          
+          const weekday = weekdays[date.getDay()];
+          const day = date.getDate();
+          const month = months[date.getMonth()];
+          
+          return `${weekday}, ${day} ${month}`;
+        }
+      }
+
+      formatDateForStorage(date) {
+        // Format date as YYYY-MM-DD in local timezone
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+
+      setupPageTransition() {
+        // Slide up and fade in the entire section when page loads
+        const financialSummary = document.getElementById('financialSummary');
+        if (financialSummary) {
+          // Set initial state immediately (no transition yet)
+          financialSummary.style.transition = 'none';
+          financialSummary.style.opacity = '0';
+          financialSummary.style.transform = 'translateY(150px)';
+          
+          // Force reflow
+          financialSummary.offsetHeight;
+          
+          // Now enable transition and animate to final state
+          setTimeout(() => {
+            financialSummary.style.transition = 'all 0.8s ease-out';
+            financialSummary.style.opacity = '1';
+            financialSummary.style.transform = 'translateY(0)';
+          }, 5);
+        }
+      }
+
+       // Switch between views without reloading
+       switchToOverview() {
+         this.switchView('overview');
+       }
+
+       switchToSpending() {
+         this.switchView('spending');
+       }
+
+       switchToList() {
+         this.switchView('list');
+       }
+
+       switchView(view) {
+         // Save the active view to localStorage
+         localStorage.setItem('activeView', view);
+         
+         // Update navigation buttons
+         this.updateNavigationButtons(view);
+         
+         // Update footer buttons
+         this.updateFooterButtons(view);
+         
+         // Update title
+         this.updateTitle(view);
+         
+         // Animate the transition (content change happens during animation)
+         this.animateViewTransition(view);
+       }
+
+       updateNavigationButtons(activeView) {
+         const overviewBtn = document.getElementById('overviewBtn');
+         const spendingBtn = document.getElementById('spendingBtn');
+         const listBtn = document.getElementById('listBtn');
+         
+         // Reset all buttons to inactive state
+         [overviewBtn, spendingBtn, listBtn].forEach(btn => {
+           btn.classList.remove('bg-white', 'text-gray-800');
+           btn.classList.add('opacity-70');
+         });
+         
+         // Set active button
+         let activeBtn;
+         switch(activeView) {
+           case 'overview':
+             activeBtn = overviewBtn;
+             break;
+           case 'spending':
+             activeBtn = spendingBtn;
+             break;
+           case 'list':
+             activeBtn = listBtn;
+             break;
+         }
+
+         if (activeBtn) {
+           // Make active button have white background and dark text
+           activeBtn.classList.remove('opacity-70');
+           activeBtn.classList.add('bg-white', 'text-gray-800');
+         }
+       }
+
+       updateFooterButtons(activeView) {
+         const footerOverviewBtn = document.getElementById('footerOverviewBtn');
+         const footerSpendingBtn = document.getElementById('footerSpendingBtn');
+
+         // Always keep Overview active in footer (since we haven't implemented other sections yet)
+         footerOverviewBtn.classList.add('text-[#9b3fff]');
+         footerOverviewBtn.classList.remove('opacity-50');
+         
+         // Keep other footer buttons inactive
+         footerSpendingBtn.classList.remove('text-[#9b3fff]');
+         footerSpendingBtn.classList.add('opacity-50');
+       }
+
+       updateTitle(view) {
+         const titleSpan = document.querySelector('h1 span');
+         if (titleSpan) {
+           titleSpan.textContent = 'My Household:';
+         }
+       }
+
+       updateContentSections(view, callback) {
+         const listView = document.getElementById('listView');
+         const spendingView = document.getElementById('spendingView');
+         const traditionalSummary = document.getElementById('traditionalSummary');
+         const spendingBarChart = document.getElementById('spendingBarChart');
+
+         if (view === 'spending') {
+           listView.style.display = 'none';
+           spendingView.style.display = 'block';
+           // Show bar chart, hide traditional summary
+           traditionalSummary.style.display = 'none';
+           spendingBarChart.style.display = 'block';
+           // Initialize with head categories tab active FIRST
+           this.initializeSpendingView();
+           // Small delay to ensure initialization is complete
+           setTimeout(async () => {
+             // Then update spending charts with correct tab state
+           await this.updateSpendingCharts();
+           }, 10);
+           // Execute callback immediately for spending view
+           if (callback) callback();
+         } else {
+           // Animate bars out before hiding
+           this.animateBarsOut(() => {
+           listView.style.display = 'block';
+           spendingView.style.display = 'none';
+           // Show traditional summary, hide bar chart
+           traditionalSummary.style.display = 'flex';
+           spendingBarChart.style.display = 'none';
+             // Execute callback after bars animation completes
+             if (callback) callback();
+           });
+         }
+       }
+
+       initializeSpendingView() {
+         // Set head categories as the default active tab
+         this.activeCategoryTab = 'head';
+         
+         // Update the visual state of the tabs
+         const headTab = document.getElementById('headCategoriesTab');
+         const categoriesTab = document.getElementById('categoriesTab');
+         
+         // Set head tab as active
+         headTab.classList.remove('bg-[#2d3748]', 'text-gray-400');
+         headTab.classList.add('bg-[#1f292c]', 'text-white');
+         
+         // Set categories tab as inactive
+         categoriesTab.classList.remove('bg-[#1f292c]', 'text-white');
+         categoriesTab.classList.add('bg-[#2d3748]', 'text-gray-400');
+       }
+
+       async updateSpendingCharts() {
+         const transactions = await this.getTransactionsForMonth();
+         
+         // Calculate totals
+         let income = 0;
+         let expenses = 0;
+         const categoryTotals = {};
+         
+         transactions.forEach(t => {
+           if (t.type === 'income') {
+             income += t.amount;
+           } else if (t.type === 'expense') {
+             expenses += t.amount;
+           }
+           
+           // Group by category for donut chart based on active transaction type
+           if (t.type === this.activeTransactionType) {
+             // Skip transactions with invalid category names
+             if (!t.category || t.category === '0' || t.category === '') {
+               return;
+             }
+             
+             if (!categoryTotals[t.category]) {
+               categoryTotals[t.category] = {
+                 amount: 0,
+                 name: t.name,
+                 icon: t.icon,
+                 color: t.color
+               };
+             }
+             categoryTotals[t.category].amount += t.amount;
+           }
+         });
+         
+         const balance = income - expenses;
+         
+         // Always show bar chart and update with data (including zeros)
+         this.updateBarChart(income, expenses, balance);
+         
+         // Update donut chart with current active tab
+         this.updateDonutChartForTab(this.activeCategoryTab);
+         
+         // Update categories list based on active tab
+         await this.updateCategoriesListForTab(this.activeCategoryTab);
+       }
+
+       toggleBarChart(income, expenses, balance) {
+         const barChartContainer = document.getElementById('spendingBarChart');
+         
+         if (income === 0 && expenses === 0 && balance === 0) {
+           // No data - hide bar chart
+           if (barChartContainer) {
+             barChartContainer.style.display = 'none';
+           }
+         } else {
+           // Has data - show bar chart and update it
+           if (barChartContainer) {
+             barChartContainer.style.display = 'block';
+             this.updateBarChart(income, expenses, balance);
+           }
+         }
+       }
+
+       updateBarChart(income, expenses, balance) {
+         // Calculate max value for scaling
+         const maxValue = Math.max(income, expenses, Math.abs(balance));
+         const maxHeight = 160; // Maximum bar height to reach the top line
+         
+         // Get bar elements
+         const incomeBar = document.getElementById('incomeBar');
+         const expensesBar = document.getElementById('expensesBar');
+         const balanceBar = document.getElementById('balanceBar');
+         
+         // Calculate heights
+         const incomeHeight = maxValue > 0 ? (income / maxValue) * maxHeight : 4;
+         const expensesHeight = maxValue > 0 ? (expenses / maxValue) * maxHeight : 4;
+         const balanceHeight = balance >= 0 && maxValue > 0 ? (balance / maxValue) * maxHeight : 4;
+         
+         // Initialize bars with opacity 0 and minimum height
+         incomeBar.style.opacity = '0';
+         incomeBar.style.height = '4px';
+         expensesBar.style.opacity = '0';
+         expensesBar.style.height = '4px';
+         balanceBar.style.opacity = '0';
+         balanceBar.style.height = '4px';
+         
+         // Animate bars with staggered timing for a more dynamic effect
+         setTimeout(() => {
+           incomeBar.style.transition = 'height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out';
+         incomeBar.style.height = `${Math.max(incomeHeight, 4)}px`;
+         incomeBar.style.borderRadius = '25px 25px 0 0';
+           incomeBar.style.width = '60px';
+           incomeBar.style.opacity = '1';
+         }, 100);
+         
+         setTimeout(() => {
+           expensesBar.style.transition = 'height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out';
+         expensesBar.style.height = `${Math.max(expensesHeight, 4)}px`;
+         expensesBar.style.borderRadius = '25px 25px 0 0';
+           expensesBar.style.width = '60px';
+           expensesBar.style.opacity = '1';
+         }, 200);
+         
+         setTimeout(() => {
+           balanceBar.style.transition = 'height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out';
+         balanceBar.style.height = `${Math.max(balanceHeight, 4)}px`;
+         balanceBar.style.borderRadius = '25px 25px 0 0';
+           balanceBar.style.width = '60px';
+           balanceBar.style.opacity = '1';
+         }, 300);
+         
+         // Animate numbers with the same staggered timing
+         setTimeout(() => {
+           this.animateNumber('incomeBarText', income, 'Q ');
+         }, 100);
+         
+         setTimeout(() => {
+           this.animateNumber('expensesBarText', expenses, 'Q ');
+         }, 200);
+         
+         setTimeout(() => {
+         const balancePrefix = balance >= 0 ? 'Q ' : '-Q ';
+         const balanceValue = Math.abs(balance);
+         this.animateNumber('balanceBarText', balanceValue, balancePrefix, balance < 0);
+         }, 300);
+       }
+
+       animateBarsOut(callback) {
+         const incomeBar = document.getElementById('incomeBar');
+         const expensesBar = document.getElementById('expensesBar');
+         const balanceBar = document.getElementById('balanceBar');
+         
+         // Check if bars are visible before animating
+         const spendingBarChart = document.getElementById('spendingBarChart');
+         if (!spendingBarChart || spendingBarChart.style.display === 'none') {
+           // If bars are not visible, execute callback immediately
+           if (callback) callback();
+           return;
+         }
+         
+         // Animate bars out with staggered timing (reverse order)
+         setTimeout(() => {
+           if (balanceBar) {
+             balanceBar.style.transition = 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-in-out';
+             balanceBar.style.height = '4px';
+             balanceBar.style.opacity = '0';
+           }
+         }, 0);
+         
+         setTimeout(() => {
+           if (expensesBar) {
+             expensesBar.style.transition = 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-in-out';
+             expensesBar.style.height = '4px';
+             expensesBar.style.opacity = '0';
+           }
+         }, 100);
+         
+         setTimeout(() => {
+           if (incomeBar) {
+             incomeBar.style.transition = 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-in-out';
+             incomeBar.style.height = '4px';
+             incomeBar.style.opacity = '0';
+           }
+         }, 200);
+         
+         // Execute callback after animation completes
+         setTimeout(() => {
+           if (callback) callback();
+         }, 400);
+       }
+
+       animateNumber(elementId, targetValue, prefix = '', isNegative = false) {
+         const element = document.getElementById(elementId);
+         const currentValue = parseInt(element.textContent.replace(/[^\d]/g, '')) || 0;
+         
+         const duration = 800; // Match bar animation duration
+         const startTime = performance.now();
+         
+         const animate = (currentTime) => {
+           const elapsed = currentTime - startTime;
+           const progress = Math.min(elapsed / duration, 1);
+           
+           // Use cubic-bezier easing to match bar animation
+           const easeInOut = progress < 0.5 
+             ? 4 * progress * progress * progress 
+             : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+           
+           const currentAnimatedValue = Math.round(currentValue + (targetValue - currentValue) * easeInOut);
+           
+           element.textContent = `${prefix}${currentAnimatedValue}`;
+           element.className = isNegative ? 'text-red-400 font-semibold text-lg' : 'text-white font-semibold text-lg';
+           
+           if (progress < 1) {
+             requestAnimationFrame(animate);
+           }
+         };
+         
+         requestAnimationFrame(animate);
+       }
+
+       updateDonutChart(categoryTotals, tabType = 'categories') {
+         let categories;
+         
+         if (tabType === 'head') {
+           // Group categories into head categories
+           categories = this.groupCategoriesIntoHeadCategories(categoryTotals);
+         } else {
+           // Use individual categories - each category gets its own segment
+           categories = Object.values(categoryTotals);
+         }
+         
+         const totalExpenses = categories.reduce((sum, cat) => sum + cat.amount, 0);
+         
+        if (totalExpenses === 0) {
+          // No transactions
+          document.getElementById('centerAmount').textContent = 'Q 0';
+          const transactionTypeText = this.activeTransactionType === 'expense' ? 'NO EXPENSES' : 'NO INCOME';
+          document.getElementById('centerCategory').textContent = transactionTypeText;
+          
+          // Hide the center icon when no transactions
+          const centerIconContainer = document.querySelector('.absolute.inset-0 .bg-blue-400');
+          if (centerIconContainer) {
+            centerIconContainer.style.display = 'none';
+          }
+          
+          // Clear all segments from the dynamic container
+          const segmentsContainer = document.getElementById('donutSegments');
+          if (segmentsContainer) {
+            segmentsContainer.innerHTML = '';
+          }
+           return;
+        }
+         
+         // Sort categories by amount (largest first)
+         categories.sort((a, b) => b.amount - a.amount);
+         
+         // Update center content with largest category (with animation)
+         const largestCategory = categories[0];
+         
+         // Add fade out effect
+         const centerAmount = document.getElementById('centerAmount');
+         const centerCategory = document.getElementById('centerCategory');
+         
+         centerAmount.style.transition = 'opacity 0.2s ease-out';
+         centerCategory.style.transition = 'opacity 0.2s ease-out';
+         centerAmount.style.opacity = '0';
+         centerCategory.style.opacity = '0';
+         
+         // Update content and fade in
+         setTimeout(() => {
+           centerAmount.textContent = `Q ${largestCategory.amount}`;
+           centerCategory.textContent = largestCategory.name.toUpperCase();
+           centerAmount.style.opacity = '1';
+           centerCategory.style.opacity = '1';
+           
+           // Show the center icon container and update icon
+           const centerIconContainer = document.querySelector('.absolute.inset-0 .bg-blue-400');
+           if (centerIconContainer) {
+             centerIconContainer.style.display = 'flex'; // Show the icon container
+             
+             const centerIcon = centerIconContainer.querySelector('i');
+             if (centerIcon && largestCategory.icon) {
+               centerIcon.className = largestCategory.icon + ' text-white text-2xl';
+             }
+           }
+         }, 200);
+         
+         // Update donut segments with fill animation
+         this.updateDonutSegments(categories, totalExpenses);
+       }
+
+      updateDonutSegments(categories, totalExpenses) {
+        console.log('updateDonutSegments called with:', { categories, totalExpenses });
+        
+        const segmentsContainer = document.getElementById('donutSegments');
+        
+        // Clear existing segments immediately (no exit animation)
+        segmentsContainer.innerHTML = '';
+        
+        // Create new segments if there are categories
+        if (categories.length > 0 && totalExpenses > 0) {
+          this.createNewSegments(categories, totalExpenses, segmentsContainer);
+        }
+        
+      }
+
+      createNewSegments(categories, totalExpenses, segmentsContainer) {
+        const radius = 40;
+        const centerX = 50;
+        const centerY = 50;
+        const strokeWidth = 8;
+        const gapAngle = 12; // 12 grados de separación entre segmentos (espacio suficiente para extremos circulares)
+        const validCategories = categories.filter(c => c.amount > 0);
+        const totalGaps = validCategories.length * gapAngle; // Gap después de cada segmento, incluyendo el último
+        const availableAngle = 360 - totalGaps; // Ángulo total disponible para los segmentos
+        
+        let currentAngle = 0; // Empezar desde 0 grados (12 en punto)
+        
+        console.log('Creating segments for categories:', validCategories);
+        console.log(`Total gaps: ${totalGaps}°, Available angle: ${availableAngle}°`);
+        console.log('Category details:', validCategories.map(c => ({ name: c.name, amount: c.amount, color: c.color })));
+        
+        validCategories.forEach((category, index) => {
+          const percentage = (category.amount / totalExpenses) * 100;
+          const angle = (percentage / 100) * availableAngle; // Usar el ángulo disponible, no 360
+          
+          console.log(`Category ${index}: ${category.name} - ${percentage.toFixed(2)}% - ${angle.toFixed(2)}° (adjusted)`);
+          console.log(`Segment starts at: ${currentAngle}°, ends at: ${currentAngle + angle}°`);
+          
+          // Crear elemento path para este segmento
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          
+          // Calcular coordenadas del arco
+          const startAngleRad = (currentAngle * Math.PI) / 180;
+          const endAngleRad = ((currentAngle + angle) * Math.PI) / 180;
+          
+          const x1 = centerX + radius * Math.cos(startAngleRad);
+          const y1 = centerY + radius * Math.sin(startAngleRad);
+          const x2 = centerX + radius * Math.cos(endAngleRad);
+          const y2 = centerY + radius * Math.sin(endAngleRad);
+          
+          // Determinar si es un arco grande
+          const largeArcFlag = angle > 180 ? 1 : 0;
+          
+          // Crear el path del arco
+          const pathData = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`;
+          
+          // Configurar el path
+          path.setAttribute('d', pathData);
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', category.color ? this.convertTailwindToHex(category.color) : this.getCategoryColor(category.name));
+          path.setAttribute('stroke-width', strokeWidth);
+          path.setAttribute('stroke-linecap', 'round');
+          path.setAttribute('class', 'donut-segment');
+          
+          // Calcular la longitud del segmento
+          const segmentLength = (angle / 360) * 251.2;
+          
+          // Animación de entrada
+          path.style.strokeDasharray = `${segmentLength} 251.2`;
+          path.style.strokeDashoffset = `${segmentLength}`; // Start hidden
+          path.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+          
+          // Agregar al contenedor
+          segmentsContainer.appendChild(path);
+          
+          // Animar después de un pequeño delay
+          setTimeout(() => {
+            path.style.strokeDashoffset = '0'; // Reveal the segment
+          }, index * 100);
+          
+          console.log(`Created segment for ${category.name}:`, {
+            startAngle: currentAngle,
+            endAngle: currentAngle + angle,
+            pathData,
+            color: category.color ? this.convertTailwindToHex(category.color) : this.getCategoryColor(category.name)
+          });
+          
+          // Mover al siguiente ángulo con gap
+          currentAngle += angle + gapAngle;
+          console.log(`Next segment will start at: ${currentAngle}° (after ${gapAngle}° gap)`);
+        });
+        
+        console.log(`Created ${segmentsContainer.children.length} segments`);
+      }
+
+      groupCategoriesIntoHeadCategories(categoryTotals) {
+        const headCategories = {};
+        
+        // Get categories from localStorage to determine head categories dynamically
+        const savedCategories = localStorage.getItem('categoriesData');
+        
+        if (savedCategories) {
+          const categoriesData = JSON.parse(savedCategories);
+          
+          // Create head categories based on the sections in localStorage
+          Object.entries(categoriesData).forEach(([sectionName, categories]) => {
+            headCategories[sectionName] = {
+              name: sectionName,
+              amount: 0,
+              icon: this.getDefaultIconForSection(sectionName),
+              color: this.getDefaultColorForSection(sectionName)
+            };
+          });
+        } else {
+          // Fallback to default head categories if localStorage is empty
+          headCategories['Miscellaneous'] = {
+            name: 'Miscellaneous',
+            amount: 0,
+            icon: 'fas fa-box',
+            color: 'bg-gray-400'
+          };
+          headCategories['Entertainment'] = {
+            name: 'Entertainment',
+            amount: 0,
+            icon: 'fas fa-smile',
+            color: 'bg-pink-400'
+          };
+        }
+        
+        // Sum up amounts for each head category based on the section each category belongs to
+        Object.entries(categoryTotals).forEach(([categoryKey, categoryData]) => {
+          // Skip categories with invalid names (like "0", empty strings, etc.)
+          if (!categoryKey || categoryKey === '0' || categoryKey === '' || !categoryData || !categoryData.amount) {
+            return;
+          }
+          
+          const headCategoryName = this.getHeadCategoryForCategory(categoryKey);
+          if (headCategories[headCategoryName]) {
+            headCategories[headCategoryName].amount += categoryData.amount;
+          }
+        });
+        
+        // Return only head categories that have amounts > 0
+        return Object.values(headCategories).filter(cat => cat.amount > 0);
+       }
+
+       updateCategoriesList(categoryTotals) {
+         const categories = Object.values(categoryTotals);
+         const totalExpenses = categories.reduce((sum, cat) => sum + cat.amount, 0);
+         
+         if (totalExpenses === 0) {
+           const transactionTypeText = this.activeTransactionType === 'expense' ? 'expenses' : 'income';
+           document.getElementById('categoriesList').innerHTML = `
+             <div class="text-center py-8">
+               <div class="text-gray-400 text-lg font-semibold mb-2">No ${transactionTypeText} yet</div>
+               <div class="text-gray-500 text-sm">Your ${transactionTypeText} categories will be listed here</div>
+             </div>
+           `;
+           return;
+         }
+         
+         // Sort categories by amount (largest first)
+         categories.sort((a, b) => b.amount - a.amount);
+         
+         const categoriesHTML = categories.map(category => `
+           <div class="flex items-center justify-between py-3 px-4 bg-[#1f292c] rounded-lg">
+             <div class="flex items-center space-x-4">
+              <i class="${category.icon} text-lg" style="color: ${this.getCategoryColor(category.name)}"></i>
+              <span class="text-white font-medium">${category.name}</span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="text-gray-400">Q ${category.amount}</span>
+              <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+          </div>
+        `).join('');
+         
+         document.getElementById('categoriesList').innerHTML = categoriesHTML;
+       }
+
+       updateCategoriesListFromHeadCategories(headCategories) {
+         const totalExpenses = headCategories.reduce((sum, cat) => sum + cat.amount, 0);
+         
+         if (totalExpenses === 0) {
+           const transactionTypeText = this.activeTransactionType === 'expense' ? 'expenses' : 'income';
+           document.getElementById('categoriesList').innerHTML = `
+             <div class="text-center py-8">
+               <div class="text-gray-400 text-lg font-semibold mb-2">No ${transactionTypeText} yet</div>
+               <div class="text-gray-500 text-sm">Your ${transactionTypeText} categories will be listed here</div>
+             </div>
+           `;
+           return;
+         }
+         
+         // Sort head categories by amount (largest first)
+         headCategories.sort((a, b) => b.amount - a.amount);
+         
+        const categoriesHTML = headCategories.map(category => `
+          <div class="flex items-center justify-between py-3 px-4 bg-[#1f292c] rounded-lg">
+            <div class="flex items-center space-x-4">
+              <i class="${category.icon} text-lg" style="color: ${category.color ? this.convertTailwindToHex(category.color) : this.getCategoryColor(category.name)}"></i>
+               <span class="text-white font-medium">${category.name}</span>
+             </div>
+             <div class="flex items-center space-x-3">
+               <span class="text-gray-400">Q ${category.amount}</span>
+               <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+             </div>
+           </div>
+         `).join('');
+         
+         document.getElementById('categoriesList').innerHTML = categoriesHTML;
+       }
+
+       getCategoryColor(categoryName) {
+         const colorMap = {
+          // Food & drinks
+          'groceries': '#60a5fa', // Blue
+          'drinks': '#60a5fa',
+          'food': '#60a5fa',
+          'restaurant': '#60a5fa',
+          'snack': '#60a5fa',
+          
+          // Transportation
+          'gas': '#a78bfa', // Purple
+          'car costs': '#a78bfa',
+          'car insurance': '#a78bfa',
+          'car loan': '#a78bfa',
+          'flight': '#a78bfa',
+          'lavado auto': '#a78bfa',
+          'parking': '#a78bfa',
+          'repair': '#a78bfa',
+          'transportation': '#a78bfa',
+          'uber/taxi': '#a78bfa',
+          
+          // Entertainment
+          'entertainment': '#f472b6', // Pink
+          'bowling': '#f472b6',
+          'cinema': '#f472b6',
+          'concert': '#f472b6',
+          'electronics': '#f472b6',
+          'gym': '#f472b6',
+          'nightclub': '#f472b6',
+          'sports': '#f472b6',
+          'subscription': '#f472b6',
+          'temu': '#facc15', // Yellow
+          'vacation': '#f472b6',
+          
+          // Housing
+          'bank': '#fb923c', // Orange
+          'bills': '#fb923c',
+          'compras en línea': '#fb923c',
+          'electricity': '#fb923c',
+          'hair cut': '#f87171', // Red
+          'housing': '#fb923c',
+          'internet': '#fb923c',
+          'loan': '#fb923c',
+          'maintenance': '#fb923c',
+          'rent': '#fb923c',
+          'service': '#fb923c',
+          'tv': '#fb923c',
+          'taxes': '#fb923c',
+          'telephone': '#fb923c',
+          'water': '#fb923c',
+          
+          // Lifestyle
+          'haircut': '#f87171', // Red
+          'iglesia': '#facc15', // Yellow
+          'lifestyle': '#f87171',
+          'office expenses': '#f87171',
+          'papás': '#f87171',
+          'pet': '#f87171',
+          'pharmacy': '#f87171',
+          'rollover': '#60a5fa', // Blue
+          'shopping': '#f87171',
+          'travel': '#f87171',
+          'work': '#f87171',
+          
+          // Miscellaneous
+          'clothes': '#9ca3af', // Gray
+          'healthcare': '#9ca3af',
+          'miscellaneous': '#9ca3af',
+          'student loan': '#9ca3af',
+          'transferencia': '#9ca3af',
+          'unknown': '#9ca3af',
+          
+          // Savings
+          'ahorros - gyt': '#f87171', // Red
+          'car': '#60a5fa', // Blue
+          'emergency savings': '#60a5fa',
+          'vacation savings': '#60a5fa',
+          
+          // Income
+          'child benefit': '#4ade80', // Green
+          'income': '#4ade80',
+          'interest': '#4ade80',
+          'investments': '#4ade80',
+          'pagos': '#facc15', // Yellow
+          'pension': '#4ade80',
+          'salary': '#4ade80'
+        };
+        
+        return colorMap[categoryName.toLowerCase()] || '#9ca3af';
+      }
+
+      getDefaultIconForSection(sectionName) {
+        const iconMap = {
+          'Entertainment': 'fas fa-smile',
+          'Food & drinks': 'fas fa-utensils',
+          'Housing': 'fas fa-home',
+          'Lifestyle': 'fas fa-star',
+          'Miscellaneous': 'fas fa-box',
+          'Savings': 'fas fa-piggy-bank',
+          'Transportation': 'fas fa-car',
+          'Income': 'fas fa-money-bill'
+        };
+        return iconMap[sectionName] || 'fas fa-box';
+      }
+
+      getDefaultColorForSection(sectionName) {
+        const colorMap = {
+          'Entertainment': 'bg-pink-400',
+          'Food & drinks': 'bg-blue-400',
+          'Housing': 'bg-orange-400',
+          'Lifestyle': 'bg-red-400',
+          'Miscellaneous': 'bg-gray-400',
+          'Savings': 'bg-blue-400',
+          'Transportation': 'bg-purple-400',
+          'Income': 'bg-green-400'
+        };
+        return colorMap[sectionName] || 'bg-gray-400';
+      }
+
+      getHeadCategoryForCategory(categoryName) {
+        // Get categories from localStorage to find which section this category belongs to
+        const savedCategories = localStorage.getItem('categoriesData');
+        
+        if (savedCategories) {
+          const categoriesData = JSON.parse(savedCategories);
+          
+          // Search through all sections for the category
+          for (const [sectionName, categories] of Object.entries(categoriesData)) {
+            const foundCategory = categories.find(cat => cat.name === categoryName);
+            if (foundCategory) {
+              return sectionName;
+            }
+          }
+        }
+        
+        // Fallback to default mapping if not found in localStorage
+        const categoryToHeadMap = {
+          'Clothes': 'Miscellaneous',
+          'Healthcare': 'Miscellaneous',
+          'Miscellaneous': 'Miscellaneous',
+          'Student loan': 'Miscellaneous',
+          'Transferencia': 'Miscellaneous',
+          'Unknown': 'Miscellaneous',
+          'Groceries': 'Food & drinks',
+          'Gas': 'Transportation',
+          'Bowling': 'Entertainment',
+          'Cinema': 'Entertainment',
+          'Concert': 'Entertainment',
+          'Electronics': 'Entertainment',
+          'Entertainment': 'Entertainment',
+          'Gym': 'Entertainment',
+          'Nightclub': 'Entertainment',
+          'Sports': 'Entertainment',
+          'Subscription': 'Entertainment',
+          'Temu': 'Entertainment',
+          'Vacation': 'Entertainment'
+        };
+        
+        return categoryToHeadMap[categoryName] || 'Miscellaneous';
+      }
+
+      convertTailwindToHex(tailwindColor) {
+        const colorMap = {
+          'bg-pink-400': '#f472b6',
+          'bg-blue-400': '#60a5fa',
+          'bg-orange-400': '#fb923c',
+          'bg-red-400': '#f87171',
+          'bg-gray-400': '#9ca3af',
+          'bg-purple-400': '#a78bfa',
+          'bg-green-400': '#4ade80',
+          'bg-yellow-400': '#facc15'
+        };
+        return colorMap[tailwindColor] || '#9ca3af';
+       }
+
+       async switchCategoryTab(tabType) {
+         const headTab = document.getElementById('headCategoriesTab');
+         const categoriesTab = document.getElementById('categoriesTab');
+         
+         // Update active tab
+         this.activeCategoryTab = tabType;
+         
+         if (tabType === 'head') {
+           headTab.classList.remove('bg-[#2d3748]', 'text-gray-400');
+           headTab.classList.add('bg-[#1f292c]', 'text-white');
+           categoriesTab.classList.remove('bg-[#1f292c]', 'text-white');
+           categoriesTab.classList.add('bg-[#2d3748]', 'text-gray-400');
+         } else {
+           categoriesTab.classList.remove('bg-[#2d3748]', 'text-gray-400');
+           categoriesTab.classList.add('bg-[#1f292c]', 'text-white');
+           headTab.classList.remove('bg-[#1f292c]', 'text-white');
+           headTab.classList.add('bg-[#2d3748]', 'text-gray-400');
+         }
+         
+         // Update categories list based on selected tab
+         await this.updateCategoriesListForTab(tabType);
+         
+         // Update donut chart based on selected tab
+         await this.updateDonutChartForTab(tabType);
+       }
+
+       async toggleExpensesIncome() {
+         // Toggle between expense and income
+         this.activeTransactionType = this.activeTransactionType === 'expense' ? 'income' : 'expense';
+         
+         // Update button text
+         const button = document.getElementById('expensesIncomeToggle');
+         
+         if (this.activeTransactionType === 'expense') {
+           button.innerHTML = 'EXPENSES <i class="fas fa-chevron-down ml-2 text-sm"></i>';
+         } else {
+           button.innerHTML = 'INCOME <i class="fas fa-chevron-up ml-2 text-sm"></i>';
+         }
+         
+         // Update charts with new transaction type
+         await this.updateSpendingCharts();
+       }
+
+       async updateCategoriesListForTab(tabType) {
+         const transactions = await this.getTransactionsForMonth();
+         const categoryTotals = {};
+         
+         transactions.forEach(t => {
+           if (t.type === this.activeTransactionType) {
+             if (!categoryTotals[t.category]) {
+               categoryTotals[t.category] = {
+                 amount: 0,
+                 name: t.name,
+                 icon: t.icon,
+                 color: t.color
+               };
+             }
+             categoryTotals[t.category].amount += t.amount;
+           }
+         });
+         
+         if (tabType === 'head') {
+           // Show head categories in the list when head tab is active
+           const headCategories = this.groupCategoriesIntoHeadCategories(categoryTotals);
+           this.updateCategoriesListFromHeadCategories(headCategories);
+         } else {
+           // Show individual categories when categories tab is active
+           this.updateCategoriesList(categoryTotals);
+         }
+       }
+
+       async updateDonutChartForTab(tabType) {
+         const transactions = await this.getTransactionsForMonth();
+         const categoryTotals = {};
+         
+         transactions.forEach(t => {
+           if (t.type === this.activeTransactionType) {
+             if (!categoryTotals[t.category]) {
+               categoryTotals[t.category] = {
+                 amount: 0,
+                 name: t.name,
+                 icon: t.icon,
+                 color: t.color
+               };
+             }
+             categoryTotals[t.category].amount += t.amount;
+           }
+         });
+         
+         // Always pass categoryTotals (object) to updateDonutChart
+         // The function will handle the grouping internally based on tabType
+         this.updateDonutChart(categoryTotals, tabType);
+       }
+
+       animateViewTransition(view) {
+         const financialSummary = document.getElementById('financialSummary');
+         if (financialSummary) {
+           // Fade out animation (like before)
+           financialSummary.style.transition = 'all 0.5s ease-in-out';
+           financialSummary.style.opacity = '0';
+           financialSummary.style.transform = 'translateY(50px)';
+           
+           // After fade out, change content and fade in
+           setTimeout(() => {
+             // Show/hide content sections during the transition
+             this.updateContentSections(view, () => {
+               // Fade in animation after content change is complete
+             financialSummary.style.transition = 'all 0.8s ease-out';
+             financialSummary.style.opacity = '1';
+             financialSummary.style.transform = 'translateY(0)';
+             });
+           }, 500);
+         }
+       }
+
+       restoreActiveView() {
+         // Get the saved active view from localStorage, default to 'list'
+         const savedView = localStorage.getItem('activeView') || 'list';
+         
+         // Restore the view without animation (since it's initial load)
+         this.updateNavigationButtons(savedView);
+         this.updateFooterButtons(savedView);
+         this.updateTitle(savedView);
+         
+         // If restoring spending view, initialize it properly
+         if (savedView === 'spending') {
+           this.initializeSpendingView();
+         }
+         
+         this.updateContentSections(savedView);
+       }
+    }
+
+    // Function to navigate to edit categories page
+    function editCategories() {
+      try {
+        // Try different navigation methods
+        if (window.location.protocol === 'file:') {
+          // If running from file system, use window.open
+          window.open('5.html', '_self');
+        } else {
+          // If running from server, use location.href
+          window.location.href = '5.html';
+        }
+      } catch (error) {
+        console.error('Error navigating to edit categories:', error);
+       }
+    }
+
+    // Function to go back
+    function goBack() {
+      try {
+        console.log('🔙 Intentando regresar...');
+        console.log('📊 Historial del navegador:', window.history.length);
+        
+        if (window.history.length > 1) {
+          console.log('⬅️ Usando history.back()');
+          window.history.back();
+        } else {
+          // If no history, go to main page
+          console.log('🏠 Yendo a página principal');
+          window.location.href = '1.html';
+        }
+      } catch (error) {
+        console.error('❌ Error going back:', error);
+        // Fallback: go to main page
+        window.location.href = '1.html';
+       }
+    }
+
+    // Function to open WhatsApp settings
+    function openWhatsAppSettings() {
+      try {
+        console.log('📱 Abriendo configuración de WhatsApp...');
+        window.location.href = 'whatsapp-settings.html';
+      } catch (error) {
+        console.error('❌ Error abriendo configuración de WhatsApp:', error);
+      }
+    }
+
+    // Initialize the month navigator when the page loads
+    let monthNavigator;
+    document.addEventListener('DOMContentLoaded', () => {
+      monthNavigator = new MonthNavigator();
+      
+      // Categories will be initialized from Firestore
+      
+      // Add some sample data for demonstration
+      if (!localStorage.getItem('transactions')) {
+        const sampleTransactions = [
+          {
+            id: 'sample_1',
+            name: 'Groceries',
+            category: 'Groceries',
+            amount: 35,
+            type: 'expense',
+            month: 8, // September
+            year: 2025,
+            date: '2025-09-15'
+          },
+          {
+            id: 'sample_2',
+            name: 'Gas',
+            category: 'Gas',
+            amount: 25,
+            type: 'expense',
+            month: 8, // September
+            year: 2025,
+            date: '2025-09-14'
+          },
+          {
+            id: 'sample_3',
+            name: 'Cinema',
+            category: 'Cinema',
+            amount: 15,
+            type: 'expense',
+            month: 8, // September
+            year: 2025,
+            date: '2025-09-13'
+          },
+          {
+            id: 'sample_4',
+            name: 'Salary',
+            category: 'Salary',
+            amount: 2000,
+            type: 'income',
+            month: 8, // September
+            year: 2025,
+            date: '2025-09-01'
+          },
+          {
+            id: 'sample_5',
+            name: 'Restaurant',
+            category: 'Restaurant',
+            amount: 45,
+            type: 'expense',
+            month: 8, // September
+            year: 2025,
+            date: '2025-09-12'
+          }
+        ];
+        localStorage.setItem('transactions', JSON.stringify(sampleTransactions));
+        console.log('Transacciones de ejemplo creadas');
+      }
+
+      // Initialize Firebase integration
+      initializeFirebase();
+    });
+
+    // Firebase integration
+    async function initializeFirebase() {
+      try {
+        // Check if user is logged in (simple check)
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) {
+          // User is not logged in, redirect to login
+          window.location.href = 'login-firebase.html';
+          return;
+        }
+
+        // Wait for Firebase to load
+        await new Promise(resolve => {
+          if (window.FirebaseService) {
+            resolve();
+          } else {
+            const checkFirebase = setInterval(() => {
+              if (window.FirebaseService) {
+                clearInterval(checkFirebase);
+                resolve();
+              }
+            }, 100);
+          }
+        });
+
+        const firebaseService = new window.FirebaseService();
+        
+        // User is logged in, continue with app initialization
+        initializeAppData(firebaseService);
+        
+      } catch (error) {
+        // If Firebase fails, still allow app to work with localStorage
+        initializeAppData(null);
+      }
+    }
+
+    // Initialize app data after authentication
+    async function initializeAppData(firebaseService) {
+      try {
+        
+        // Check if categories exist in Firestore, if not, save default categories
+        const categoriesData = await firebaseService.loadCategories();
+        console.log('📊 Categorías en Firestore:', Object.keys(categoriesData).length);
+        if (Object.keys(categoriesData).length === 0) {
+          console.log('📝 No hay categorías en Firestore, guardando categorías por defecto...');
+          
+          const defaultCategoriesData = {
+            'Entertainment': [
+              { name: 'Bowling', icon: 'fas fa-bowling-ball', color: 'bg-pink-400' },
+              { name: 'Cinema', icon: 'fas fa-video', color: 'bg-pink-400' },
+              { name: 'Concert', icon: 'fas fa-microphone', color: 'bg-pink-400' },
+              { name: 'Electronics', icon: 'fas fa-bolt', color: 'bg-pink-400' },
+              { name: 'Entertainment', icon: 'fas fa-smile', color: 'bg-pink-400' },
+              { name: 'Gym', icon: 'fas fa-dumbbell', color: 'bg-pink-400' },
+              { name: 'Nightclub', icon: 'fas fa-beer', color: 'bg-pink-400' },
+              { name: 'Sports', icon: 'fas fa-futbol', color: 'bg-pink-400' },
+              { name: 'Subscription', icon: 'fas fa-gift', color: 'bg-pink-400' },
+              { name: 'Temu', icon: 'fas fa-shopping-bag', color: 'bg-yellow-400' },
+              { name: 'Vacation', icon: 'fas fa-cocktail', color: 'bg-pink-400' }
+            ],
+            'Food & drinks': [
+              { name: 'Coffee', icon: 'fas fa-coffee', color: 'bg-blue-400' },
+              { name: 'Drinks', icon: 'fas fa-glass-martini', color: 'bg-blue-400' },
+              { name: 'Food', icon: 'fas fa-utensils', color: 'bg-blue-400' },
+              { name: 'Groceries', icon: 'fas fa-shopping-cart', color: 'bg-blue-400' },
+              { name: 'Restaurant', icon: 'fas fa-building', color: 'bg-blue-400' },
+              { name: 'Snack', icon: 'fas fa-candy-cane', color: 'bg-blue-400' }
+            ],
+            'Housing': [
+              { name: 'Bank', icon: 'fas fa-university', color: 'bg-orange-400' },
+              { name: 'Bills', icon: 'fas fa-file-alt', color: 'bg-orange-400' },
+              { name: 'Compras en línea', icon: 'fas fa-shopping-bag', color: 'bg-orange-400' },
+              { name: 'Electricity', icon: 'fas fa-bolt', color: 'bg-orange-400' },
+              { name: 'Hair cut', icon: 'fas fa-cut', color: 'bg-red-400' },
+              { name: 'Housing', icon: 'fas fa-home', color: 'bg-orange-400' },
+              { name: 'Internet', icon: 'fas fa-wifi', color: 'bg-orange-400' },
+              { name: 'Loan', icon: 'fas fa-money-bill', color: 'bg-orange-400' },
+              { name: 'Maintenance', icon: 'fas fa-hammer', color: 'bg-orange-400' },
+              { name: 'Rent', icon: 'fas fa-home', color: 'bg-orange-400' },
+              { name: 'Service', icon: 'fas fa-tools', color: 'bg-orange-400' },
+              { name: 'TV', icon: 'fas fa-tv', color: 'bg-orange-400' },
+              { name: 'Taxes', icon: 'fas fa-file-alt', color: 'bg-orange-400' },
+              { name: 'Telephone', icon: 'fas fa-phone', color: 'bg-orange-400' },
+              { name: 'Water', icon: 'fas fa-tint', color: 'bg-orange-400' }
+            ],
+            'Lifestyle': [
+              { name: 'Haircut', icon: 'fas fa-cut', color: 'bg-red-400' },
+              { name: 'Iglesia', icon: 'fas fa-church', color: 'bg-yellow-400' },
+              { name: 'Lifestyle', icon: 'fas fa-star', color: 'bg-red-400' },
+              { name: 'Office expenses', icon: 'fas fa-briefcase', color: 'bg-red-400' },
+              { name: 'Papás', icon: 'fas fa-heart', color: 'bg-red-400' },
+              { name: 'Pet', icon: 'fas fa-paw', color: 'bg-red-400' },
+              { name: 'Pharmacy', icon: 'fas fa-band-aid', color: 'bg-red-400' },
+              { name: 'Rollover', icon: 'fas fa-sync', color: 'bg-blue-400' },
+              { name: 'Shopping', icon: 'fas fa-shopping-bag', color: 'bg-red-400' },
+              { name: 'Travel', icon: 'fas fa-plane', color: 'bg-red-400' },
+              { name: 'Work', icon: 'fas fa-briefcase', color: 'bg-red-400' }
+            ],
+            'Miscellaneous': [
+              { name: 'Clothes', icon: 'fas fa-tshirt', color: 'bg-gray-400' },
+              { name: 'Healthcare', icon: 'fas fa-heart', color: 'bg-gray-400' },
+              { name: 'Miscellaneous', icon: 'fas fa-box', color: 'bg-gray-400' },
+              { name: 'Student loan', icon: 'fas fa-graduation-cap', color: 'bg-gray-400' },
+              { name: 'Transferencia', icon: 'fas fa-exchange-alt', color: 'bg-gray-400' },
+              { name: 'Unknown', icon: 'fas fa-question', color: 'bg-gray-400' }
+            ],
+            'Savings': [
+              { name: 'Ahorros - GYT', icon: 'fas fa-piggy-bank', color: 'bg-blue-400' },
+              { name: 'Car', icon: 'fas fa-car', color: 'bg-blue-400' },
+              { name: 'Emergency savings', icon: 'fas fa-piggy-bank', color: 'bg-blue-400' },
+              { name: 'Vacation savings', icon: 'fas fa-piggy-bank', color: 'bg-blue-400' }
+            ],
+            'Transportation': [
+              { name: 'Car costs', icon: 'fas fa-car', color: 'bg-purple-400' },
+              { name: 'Car insurance', icon: 'fas fa-file-alt', color: 'bg-purple-400' },
+              { name: 'Car loan', icon: 'fas fa-car', color: 'bg-purple-400' },
+              { name: 'Flight', icon: 'fas fa-plane', color: 'bg-purple-400' },
+              { name: 'Gas', icon: 'fas fa-gas-pump', color: 'bg-purple-400' },
+              { name: 'Lavado auto', icon: 'fas fa-car', color: 'bg-purple-400' },
+              { name: 'Parking', icon: 'fas fa-parking', color: 'bg-purple-400' },
+              { name: 'Repair', icon: 'fas fa-wrench', color: 'bg-purple-400' },
+              { name: 'Transportation', icon: 'fas fa-train', color: 'bg-purple-400' },
+              { name: 'Uber/Taxi', icon: 'fas fa-car', color: 'bg-purple-400' }
+            ],
+            'Income': [
+              { name: 'Child benefit', icon: 'fas fa-child', color: 'bg-green-400' },
+              { name: 'Income', icon: 'fas fa-money-bill', color: 'bg-green-400' },
+              { name: 'Interest', icon: 'fas fa-university', color: 'bg-green-400' },
+              { name: 'Investments', icon: 'fas fa-chart-line', color: 'bg-green-400' },
+              { name: 'Pagos', icon: 'fas fa-wallet', color: 'bg-yellow-400' },
+              { name: 'Pension', icon: 'fas fa-shield-alt', color: 'bg-green-400' },
+              { name: 'Salary', icon: 'fas fa-money-bill', color: 'bg-green-400' }
+            ]
+          };
+          
+          // Save default categories to Firestore
+          await firebaseService.saveCategories(defaultCategoriesData);
+          console.log('✅ Categorías por defecto guardadas en Firestore');
+        } else {
+          console.log('✅ Categorías encontradas en Firestore:', Object.keys(categoriesData));
+        }
+
+        // Set up auto-sync every 30 seconds (disabled temporarily to avoid conflicts)
+        // setInterval(async () => {
+        //   await firebaseService.syncToFirestore();
+        // }, 30000);
+
+        // Sync when data changes (disabled temporarily to avoid conflicts)
+        // const originalSetItem = localStorage.setItem;
+        // localStorage.setItem = function(key, value) {
+        //   originalSetItem.apply(this, arguments);
+        //   
+        //   // Sync to Firestore when important data changes
+        //   if (key === 'transactions' || key === 'categoriesData' || key === 'currentMonth') {
+        //     setTimeout(async () => {
+        //       await firebaseService.syncToFirestore();
+        //     }, 1000); // Small delay to ensure all changes are complete
+        //   }
+        // };
+
+        console.log('Firebase integrado correctamente');
+        
+        // Add debug functions to window for testing
+        window.debugFirebase = {
+          async checkTransactions() {
+            const firebaseService = new window.FirebaseService();
+            const transactions = await firebaseService.loadTransactions();
+            console.log('🔍 Transacciones en Firebase:', transactions);
+            return transactions;
+          },
+          async checkCategories() {
+            const firebaseService = new window.FirebaseService();
+            const categories = await firebaseService.loadCategories();
+            console.log('🔍 Categorías en Firebase:', categories);
+            return categories;
+          },
+          async forceUpdate() {
+            const monthNavigator = new MonthNavigator();
+            await monthNavigator.updateDisplay();
+            console.log('🔄 Display forzado a actualizar');
+          },
+          async initTransactionsField() {
+            const firebaseService = new window.FirebaseService();
+            await firebaseService.saveTransactions([]);
+            console.log('✅ Campo transactions inicializado en Firebase');
+          },
+          async testSaveTransaction() {
+            const firebaseService = new window.FirebaseService();
+            const testTransaction = {
+              id: Date.now(),
+              amount: 100,
+              type: 'expense',
+              category: 'Test',
+              date: new Date().toISOString().split('T')[0],
+              note: 'Test transaction',
+              month: new Date().getMonth(),
+              year: new Date().getFullYear()
+            };
+            
+            const existing = await firebaseService.loadTransactions();
+            existing.push(testTransaction);
+            await firebaseService.saveTransactions(existing);
+            console.log('✅ Transacción de prueba guardada');
+          },
+          async cleanFirebase() {
+            // Clear localStorage
+            localStorage.clear();
+            console.log('✅ localStorage limpiado');
+            
+            // Set fixed user ID
+            localStorage.setItem('firebaseUserId', 'buddy_finanzas_user');
+            console.log('✅ User ID fijado');
+            
+            // Reload page
+            location.reload();
+          }
+        };
+        
+        // Sync button removed as requested
+        
+      } catch (error) {
+        console.error('Error inicializando Firebase:', error);
+      }
+    }
+
+    // Sync button function removed as requested
+
+    // Logout function
+    async function handleLogout() {
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        try {
+          // Clear user data from localStorage
+          localStorage.removeItem('userEmail');
+          localStorage.removeItem('userId');
+          
+          // Try Firebase logout if available
+          if (window.FirebaseService) {
+            const firebaseService = new window.FirebaseService();
+            await firebaseService.signOut();
+          }
+          
+          // Redirect to login page
+          window.location.href = 'login-firebase.html';
+        } catch (error) {
+          // Even if Firebase fails, still redirect
+          window.location.href = 'login-firebase.html';
+        }
+      }
+    }
+
+    // Clear all cache function
+    function clearAllCache() {
+      if (confirm('¿Estás seguro de que quieres limpiar todo el cache? Esto recargará la página.')) {
+        try {
+          // Clear localStorage
+          localStorage.clear();
+          console.log('✅ localStorage limpiado');
+          
+          // Clear sessionStorage
+          sessionStorage.clear();
+          console.log('✅ sessionStorage limpiado');
+          
+          // Clear service worker cache
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (let name of names) {
+                caches.delete(name);
+                console.log('✅ Cache eliminado:', name);
+              }
+            });
+          }
+          
+          // Clear IndexedDB (if exists)
+          if ('indexedDB' in window) {
+            indexedDB.databases().then(databases => {
+              databases.forEach(db => {
+                indexedDB.deleteDatabase(db.name);
+                console.log('✅ IndexedDB eliminado:', db.name);
+              });
+            });
+          }
+          
+          // Show success message
+          alert('Cache limpiado correctamente. Recargando página...');
+          
+          // Force reload
+          setTimeout(() => {
+            location.reload(true);
+          }, 1000);
+          
+        } catch (error) {
+          console.error('❌ Error limpiando cache:', error);
+          alert('Error limpiando cache: ' + error.message);
+        }
+      }
+    }
+  </script>
+ </body>
+</html>

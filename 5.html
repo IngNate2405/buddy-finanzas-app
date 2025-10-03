@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Categories - Buddy Finanzas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            min-height: 100vh;
+        }
+        
+        .category-section {
+            background: #1f2937;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .category-item {
+            transition: all 0.3s ease;
+        }
+        
+        .category-item:hover {
+            background: #374151;
+        }
+        
+        .delete-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .delete-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .section-header {
+            background: #374151;
+            border-bottom: 1px solid #4b5563;
+        }
+        
+        .edit-section-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .edit-section-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .category-item:hover {
+            background: #374151;
+        }
+        
+        .category-item .cursor-pointer:hover {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Header -->
+    <div class="bg-[#1f2937] px-4 py-3 flex items-center justify-between">
+        <button onclick="goBack()" class="text-white text-xl">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="text-lg font-semibold">Edit Categories</h1>
+        <div class="w-6"></div> <!-- Spacer -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="px-4 py-4">
+        <!-- Action Buttons -->
+        <div class="mb-6">
+            <button onclick="createNewCategory()" class="w-full bg-[#374151] rounded-lg p-4 flex items-center justify-between mb-3">
+                <span class="text-white font-medium">Create new category</span>
+                <i class="fas fa-plus text-white"></i>
+            </button>
+            
+            <button onclick="viewRemovedCategories()" class="w-full bg-[#374151] rounded-lg p-4 flex items-center justify-between">
+                <span class="text-white font-medium">Removed categories</span>
+                <i class="fas fa-chevron-right text-white"></i>
+            </button>
+        </div>
+
+        <!-- Categories List -->
+        <div id="categoriesList">
+            <!-- Categories will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <!-- Create/Edit Category Modal -->
+    <div id="categoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-[#1f2937] rounded-xl p-6 w-full max-w-md">
+                <h2 id="modalTitle" class="text-xl font-semibold mb-4">Create New Category</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Category Name</label>
+                    <input type="text" id="categoryName" class="w-full bg-[#374151] border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="Enter category name">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Section</label>
+                    <select id="categorySection" class="w-full bg-[#374151] border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Food & drinks">Food & drinks</option>
+                        <option value="Housing">Housing</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                        <option value="Miscellaneous">Miscellaneous</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Income">Income</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Icon</label>
+                    <div class="grid grid-cols-6 gap-2" id="iconGrid">
+                        <!-- Icons will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="closeModal()" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg">Cancel</button>
+                    <button onclick="saveCategory()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Section Modal -->
+    <div id="sectionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-[#1f2937] rounded-xl p-6 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-4">Edit Section</h2>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Section Name</label>
+                    <input type="text" id="sectionName" class="w-full bg-[#374151] border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="Enter section name">
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="closeSectionModal()" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg">Cancel</button>
+                    <button onclick="saveSection()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div id="editCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-[#1f2937] rounded-xl p-6 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-4">Edit Category</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Category Name</label>
+                    <input type="text" id="editCategoryName" class="w-full bg-[#374151] border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="Enter category name">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Section</label>
+                    <select id="editCategorySection" class="w-full bg-[#374151] border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Food & drinks">Food & drinks</option>
+                        <option value="Housing">Housing</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                        <option value="Miscellaneous">Miscellaneous</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Income">Income</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Icon</label>
+                    <div class="grid grid-cols-6 gap-2" id="editIconGrid">
+                        <!-- Icons will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="closeEditCategoryModal()" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg">Cancel</button>
+                    <button onclick="saveEditedCategory()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Category data structure
+        const categoriesData = {
+            'Entertainment': [
+                { name: 'Bowling', icon: 'fas fa-bowling-ball', color: 'bg-pink-400' },
+                { name: 'Cinema', icon: 'fas fa-video', color: 'bg-pink-400' },
+                { name: 'Concert', icon: 'fas fa-microphone', color: 'bg-pink-400' },
+                { name: 'Electronics', icon: 'fas fa-bolt', color: 'bg-pink-400' },
+                { name: 'Entertainment', icon: 'fas fa-smile', color: 'bg-pink-400' },
+                { name: 'Gym', icon: 'fas fa-dumbbell', color: 'bg-pink-400' },
+                { name: 'Nightclub', icon: 'fas fa-beer', color: 'bg-pink-400' },
+                { name: 'Sports', icon: 'fas fa-futbol', color: 'bg-pink-400' },
+                { name: 'Subscription', icon: 'fas fa-gift', color: 'bg-pink-400' },
+                { name: 'Temu', icon: 'fas fa-shopping-bag', color: 'bg-yellow-400' },
+                { name: 'Vacation', icon: 'fas fa-cocktail', color: 'bg-pink-400' }
+            ],
+            'Food & drinks': [
+                { name: 'Coffee', icon: 'fas fa-coffee', color: 'bg-blue-400' },
+                { name: 'Drinks', icon: 'fas fa-glass-martini', color: 'bg-blue-400' },
+                { name: 'Food', icon: 'fas fa-utensils', color: 'bg-blue-400' },
+                { name: 'Groceries', icon: 'fas fa-shopping-cart', color: 'bg-blue-400' },
+                { name: 'Restaurant', icon: 'fas fa-building', color: 'bg-blue-400' },
+                { name: 'Snack', icon: 'fas fa-candy-cane', color: 'bg-blue-400' }
+            ],
+            'Housing': [
+                { name: 'Bank', icon: 'fas fa-university', color: 'bg-orange-400' },
+                { name: 'Bills', icon: 'fas fa-home', color: 'bg-orange-400' },
+                { name: 'Compras en línea', icon: 'fas fa-shopping-bag', color: 'bg-orange-400' },
+                { name: 'Electricity', icon: 'fas fa-bolt', color: 'bg-orange-400' },
+                { name: 'Hair cut', icon: 'fas fa-cut', color: 'bg-red-400' },
+                { name: 'Housing', icon: 'fas fa-home', color: 'bg-orange-400' },
+                { name: 'Internet', icon: 'fas fa-wifi', color: 'bg-orange-400' },
+                { name: 'Loan', icon: 'fas fa-money-bill', color: 'bg-orange-400' },
+                { name: 'Maintenance', icon: 'fas fa-hammer', color: 'bg-orange-400' },
+                { name: 'Rent', icon: 'fas fa-university', color: 'bg-orange-400' },
+                { name: 'Service', icon: 'fas fa-box', color: 'bg-orange-400' },
+                { name: 'TV', icon: 'fas fa-tv', color: 'bg-orange-400' },
+                { name: 'Taxes', icon: 'fas fa-money-bill', color: 'bg-orange-400' },
+                { name: 'Telephone', icon: 'fas fa-phone', color: 'bg-orange-400' },
+                { name: 'Water', icon: 'fas fa-tint', color: 'bg-orange-400' }
+            ],
+            'Lifestyle': [
+                { name: 'Haircut', icon: 'fas fa-smile', color: 'bg-red-400' },
+                { name: 'Iglesia', icon: 'fas fa-home', color: 'bg-yellow-400' },
+                { name: 'Lifestyle', icon: 'fas fa-star', color: 'bg-red-400' },
+                { name: 'Office expenses', icon: 'fas fa-briefcase', color: 'bg-red-400' },
+                { name: 'Papás', icon: 'fas fa-heart', color: 'bg-red-400' },
+                { name: 'Pet', icon: 'fas fa-paw', color: 'bg-red-400' },
+                { name: 'Pharmacy', icon: 'fas fa-band-aid', color: 'bg-red-400' },
+                { name: 'RollOver', icon: 'fas fa-sync', color: 'bg-blue-400' },
+                { name: 'Shopping', icon: 'fas fa-shopping-cart', color: 'bg-red-400' },
+                { name: 'Travel', icon: 'fas fa-plane', color: 'bg-red-400' },
+                { name: 'Work', icon: 'fas fa-briefcase', color: 'bg-red-400' }
+            ],
+            'Miscellaneous': [
+                { name: 'Clothes', icon: 'fas fa-tshirt', color: 'bg-gray-400' },
+                { name: 'Healthcare', icon: 'fas fa-heart', color: 'bg-gray-400' },
+                { name: 'Miscellaneous', icon: 'fas fa-box', color: 'bg-gray-400' },
+                { name: 'Student loan', icon: 'fas fa-graduation-cap', color: 'bg-gray-400' },
+                { name: 'Transferencia', icon: 'fas fa-university', color: 'bg-gray-400' },
+                { name: 'Unknown', icon: 'fas fa-university', color: 'bg-gray-400' }
+            ],
+            'Savings': [
+                { name: 'Ahorros - GYT', icon: 'fas fa-piggy-bank', color: 'bg-red-400' },
+                { name: 'Car', icon: 'fas fa-car', color: 'bg-blue-400' },
+                { name: 'Emergency savings', icon: 'fas fa-star', color: 'bg-blue-400' },
+                { name: 'Vacation savings', icon: 'fas fa-cocktail', color: 'bg-blue-400' }
+            ],
+            'Transportation': [
+                { name: 'Car costs', icon: 'fas fa-car', color: 'bg-purple-400' },
+                { name: 'Car insurance', icon: 'fas fa-file-alt', color: 'bg-purple-400' },
+                { name: 'Car loan', icon: 'fas fa-car', color: 'bg-purple-400' },
+                { name: 'Flight', icon: 'fas fa-plane', color: 'bg-purple-400' },
+                { name: 'Gas', icon: 'fas fa-gas-pump', color: 'bg-purple-400' },
+                { name: 'Lavado auto', icon: 'fas fa-car', color: 'bg-purple-400' },
+                { name: 'Parking', icon: 'fas fa-parking', color: 'bg-purple-400' },
+                { name: 'Repair', icon: 'fas fa-wrench', color: 'bg-purple-400' },
+                { name: 'Transportation', icon: 'fas fa-train', color: 'bg-purple-400' },
+                { name: 'Uber/Taxi', icon: 'fas fa-car', color: 'bg-purple-400' }
+            ],
+            'Income': [
+                { name: 'Child benefit', icon: 'fas fa-child', color: 'bg-green-400' },
+                { name: 'Income', icon: 'fas fa-money-bill', color: 'bg-green-400' },
+                { name: 'Interest', icon: 'fas fa-university', color: 'bg-green-400' },
+                { name: 'Investments', icon: 'fas fa-chart-line', color: 'bg-green-400' },
+                { name: 'Pagos', icon: 'fas fa-wallet', color: 'bg-yellow-400' },
+                { name: 'Pension', icon: 'fas fa-shield-alt', color: 'bg-green-400' },
+                { name: 'Salary', icon: 'fas fa-money-bill', color: 'bg-green-400' }
+            ]
+        };
+
+        let currentEditingCategory = null;
+        let currentEditingSection = null;
+
+        // Available icons for selection
+        const availableIcons = [
+            'fas fa-bowling-ball', 'fas fa-video', 'fas fa-microphone', 'fas fa-bolt',
+            'fas fa-smile', 'fas fa-dumbbell', 'fas fa-beer', 'fas fa-futbol',
+            'fas fa-gift', 'fas fa-shopping-bag', 'fas fa-cocktail', 'fas fa-coffee',
+            'fas fa-glass-martini', 'fas fa-utensils', 'fas fa-shopping-cart',
+            'fas fa-building', 'fas fa-candy-cane', 'fas fa-university', 'fas fa-home',
+            'fas fa-wifi', 'fas fa-money-bill', 'fas fa-hammer', 'fas fa-box',
+            'fas fa-tv', 'fas fa-phone', 'fas fa-tint', 'fas fa-cut', 'fas fa-star',
+            'fas fa-briefcase', 'fas fa-heart', 'fas fa-paw', 'fas fa-band-aid',
+            'fas fa-sync', 'fas fa-plane', 'fas fa-tshirt', 'fas fa-graduation-cap',
+            'fas fa-piggy-bank', 'fas fa-car', 'fas fa-file-alt', 'fas fa-gas-pump',
+            'fas fa-parking', 'fas fa-wrench', 'fas fa-train', 'fas fa-child',
+            'fas fa-chart-line', 'fas fa-wallet', 'fas fa-shield-alt'
+        ];
+
+        // Load categories from localStorage or use default
+        function loadCategories() {
+            const saved = localStorage.getItem('categoriesData');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            // If no saved categories, save the default ones to localStorage
+            saveCategories(categoriesData);
+            return categoriesData;
+        }
+
+        // Save categories to localStorage
+        function saveCategories(data) {
+            localStorage.setItem('categoriesData', JSON.stringify(data));
+        }
+
+        // Render categories
+        function renderCategories() {
+            const data = loadCategories();
+            const container = document.getElementById('categoriesList');
+            container.innerHTML = '';
+
+            Object.entries(data).forEach(([sectionName, categories]) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'category-section';
+                
+                // Section header
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'section-header px-4 py-3 flex items-center justify-between';
+                headerDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <button onclick="editSection('${sectionName}')" class="edit-section-btn mr-2">
+                            <i class="fas fa-pencil text-gray-400"></i>
+                        </button>
+                        <span class="text-white font-medium">${sectionName}</span>
+                    </div>
+                `;
+                
+                sectionDiv.appendChild(headerDiv);
+                
+                // Categories in section
+                categories.forEach(category => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category-item px-4 py-3 flex items-center justify-between border-b border-gray-700 last:border-b-0';
+                    categoryDiv.innerHTML = `
+                        <div class="flex items-center flex-1 cursor-pointer" onclick="editCategory('${sectionName}', '${category.name}')">
+                            <button onclick="event.stopPropagation(); deleteCategory('${sectionName}', '${category.name}')" class="delete-btn mr-3 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-minus text-white text-xs"></i>
+                            </button>
+                            <div class="w-8 h-8 ${category.color} rounded-full flex items-center justify-center mr-3">
+                                <i class="${category.icon} text-white text-sm"></i>
+                            </div>
+                            <span class="text-white">${category.name}</span>
+                        </div>
+                    `;
+                    sectionDiv.appendChild(categoryDiv);
+                });
+                
+                container.appendChild(sectionDiv);
+            });
+        }
+
+        // Navigation functions
+        function goBack() {
+            // Check if we came from categories page
+            if (document.referrer.includes('4.html')) {
+                window.location.href = '4.html';
+            } else {
+                window.location.href = '1.html';
+            }
+        }
+
+        function createNewCategory() {
+            currentEditingCategory = null;
+            document.getElementById('modalTitle').textContent = 'Create New Category';
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categorySection').value = 'Miscellaneous';
+            populateIconGrid();
+            document.getElementById('categoryModal').classList.remove('hidden');
+        }
+
+        function viewRemovedCategories() {
+            // TODO: Implement removed categories view
+            alert('Removed categories functionality coming soon!');
+        }
+
+        function editSection(sectionName) {
+            currentEditingSection = sectionName;
+            document.getElementById('sectionName').value = sectionName;
+            document.getElementById('sectionModal').classList.remove('hidden');
+        }
+
+        function deleteCategory(sectionName, categoryName) {
+            if (confirm(`Are you sure you want to delete "${categoryName}"?`)) {
+                const data = loadCategories();
+                data[sectionName] = data[sectionName].filter(cat => cat.name !== categoryName);
+                saveCategories(data);
+                renderCategories();
+            }
+        }
+
+        // Modal functions
+        function closeModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+        }
+
+        function closeSectionModal() {
+            document.getElementById('sectionModal').classList.add('hidden');
+        }
+
+        function closeEditCategoryModal() {
+            document.getElementById('editCategoryModal').classList.add('hidden');
+        }
+
+        function populateIconGrid() {
+            const grid = document.getElementById('iconGrid');
+            grid.innerHTML = '';
+            
+            availableIcons.forEach(icon => {
+                const iconBtn = document.createElement('button');
+                iconBtn.className = 'w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-500 transition-colors';
+                iconBtn.innerHTML = `<i class="${icon} text-white text-sm"></i>`;
+                iconBtn.onclick = () => selectIcon(icon);
+                grid.appendChild(iconBtn);
+            });
+        }
+
+        let selectedIcon = 'fas fa-box';
+
+        function selectIcon(icon) {
+            selectedIcon = icon;
+            // Update visual selection
+            document.querySelectorAll('#iconGrid button').forEach(btn => {
+                btn.classList.remove('bg-blue-500');
+                btn.classList.add('bg-gray-600');
+            });
+            event.target.closest('button').classList.remove('bg-gray-600');
+            event.target.closest('button').classList.add('bg-blue-500');
+        }
+
+        function saveCategory() {
+            const name = document.getElementById('categoryName').value.trim();
+            const section = document.getElementById('categorySection').value;
+            
+            if (!name) {
+                alert('Please enter a category name');
+                return;
+            }
+            
+            const data = loadCategories();
+            
+            if (currentEditingCategory) {
+                // Edit existing category
+                // TODO: Implement edit functionality
+            } else {
+                // Create new category
+                if (!data[section]) {
+                    data[section] = [];
+                }
+                
+                data[section].push({
+                    name: name,
+                    icon: selectedIcon,
+                    color: getDefaultColorForSection(section)
+                });
+            }
+            
+            saveCategories(data);
+            renderCategories();
+            closeModal();
+        }
+
+        function saveSection() {
+            const newName = document.getElementById('sectionName').value.trim();
+            
+            if (!newName) {
+                alert('Please enter a section name');
+                return;
+            }
+            
+            if (newName === currentEditingSection) {
+                closeSectionModal();
+                return;
+            }
+            
+            const data = loadCategories();
+            
+            if (data[newName]) {
+                alert('A section with this name already exists');
+                return;
+            }
+            
+            // Rename section
+            data[newName] = data[currentEditingSection];
+            delete data[currentEditingSection];
+            
+            saveCategories(data);
+            renderCategories();
+            closeSectionModal();
+        }
+
+        function getDefaultColorForSection(section) {
+            const colorMap = {
+                'Entertainment': 'bg-pink-400',
+                'Food & drinks': 'bg-blue-400',
+                'Housing': 'bg-orange-400',
+                'Lifestyle': 'bg-red-400',
+                'Miscellaneous': 'bg-gray-400',
+                'Savings': 'bg-blue-400',
+                'Transportation': 'bg-purple-400',
+                'Income': 'bg-green-400'
+            };
+            return colorMap[section] || 'bg-gray-400';
+        }
+
+        function editCategory(sectionName, categoryName) {
+            const data = loadCategories();
+            const category = data[sectionName].find(cat => cat.name === categoryName);
+            
+            if (!category) return;
+            
+            currentEditingCategory = { sectionName, categoryName };
+            
+            // Populate the edit modal
+            document.getElementById('editCategoryName').value = category.name;
+            document.getElementById('editCategorySection').value = sectionName;
+            
+            // Populate icon grid for editing
+            populateEditIconGrid();
+            
+            // Select current icon
+            selectedIcon = category.icon;
+            setTimeout(() => {
+                const iconButtons = document.querySelectorAll('#editIconGrid button');
+                iconButtons.forEach(btn => {
+                    const icon = btn.querySelector('i').className;
+                    if (icon === category.icon) {
+                        btn.classList.remove('bg-gray-600');
+                        btn.classList.add('bg-blue-500');
+                    }
+                });
+            }, 100);
+            
+            document.getElementById('editCategoryModal').classList.remove('hidden');
+        }
+
+        function populateEditIconGrid() {
+            const grid = document.getElementById('editIconGrid');
+            grid.innerHTML = '';
+            
+            availableIcons.forEach(icon => {
+                const iconBtn = document.createElement('button');
+                iconBtn.className = 'w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-500 transition-colors';
+                iconBtn.innerHTML = `<i class="${icon} text-white text-sm"></i>`;
+                iconBtn.onclick = () => selectEditIcon(icon);
+                grid.appendChild(iconBtn);
+            });
+        }
+
+        function selectEditIcon(icon) {
+            selectedIcon = icon;
+            // Update visual selection
+            document.querySelectorAll('#editIconGrid button').forEach(btn => {
+                btn.classList.remove('bg-blue-500');
+                btn.classList.add('bg-gray-600');
+            });
+            event.target.closest('button').classList.remove('bg-gray-600');
+            event.target.closest('button').classList.add('bg-blue-500');
+        }
+
+        function saveEditedCategory() {
+            const newName = document.getElementById('editCategoryName').value.trim();
+            const newSection = document.getElementById('editCategorySection').value;
+            
+            if (!newName) {
+                alert('Please enter a category name');
+                return;
+            }
+            
+            if (!currentEditingCategory) return;
+            
+            const data = loadCategories();
+            const { sectionName, categoryName } = currentEditingCategory;
+            
+            // Find the category to edit
+            const categoryIndex = data[sectionName].findIndex(cat => cat.name === categoryName);
+            if (categoryIndex === -1) return;
+            
+            // Remove from old section
+            const category = data[sectionName].splice(categoryIndex, 1)[0];
+            
+            // Update category properties
+            category.name = newName;
+            category.icon = selectedIcon;
+            category.color = getDefaultColorForSection(newSection);
+            
+            // Add to new section
+            if (!data[newSection]) {
+                data[newSection] = [];
+            }
+            data[newSection].push(category);
+            
+            // If old section is empty, remove it
+            if (data[sectionName].length === 0) {
+                delete data[sectionName];
+            }
+            
+            saveCategories(data);
+            renderCategories();
+            closeEditCategoryModal();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+        });
+
+        // Function to go back
+        function goBack() {
+            try {
+                console.log('🔙 Intentando regresar desde edit categories...');
+                console.log('📊 Historial del navegador:', window.history.length);
+                
+                if (window.history.length > 1) {
+                    console.log('⬅️ Usando history.back()');
+                    window.history.back();
+                } else {
+                    // If no history, go to main page
+                    console.log('🏠 Yendo a página principal');
+                    window.location.href = '1.html';
+                }
+            } catch (error) {
+                console.error('❌ Error going back:', error);
+                // Fallback: go to main page
+                window.location.href = '1.html';
+            }
+        }
+    </script>
+</body>
+</html>

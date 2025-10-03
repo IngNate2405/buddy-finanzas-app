@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buddy Finanzas - Redirigiendo...</title>
+  <script>
+    // Check if user is logged in
+    const userEmail = localStorage.getItem('userEmail');
+    if (userEmail) {
+      // User is logged in, go to main app
+      window.location.href = '1.html';
+    } else {
+      // User is not logged in, go to login
+      window.location.href = 'login-firebase.html';
+    }
+  </script>
+</head>
+<body>
+  <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
+    <div style="text-align: center;">
+      <h2>Redirigiendo a Buddy Finanzas...</h2>
+      <p>Si no eres redirigido automáticamente, <a href="login-firebase.html">haz clic aquí</a></p>
+    </div>
+  </div>
+</body>
+</html>

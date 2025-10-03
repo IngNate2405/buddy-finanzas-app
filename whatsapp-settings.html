@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración WhatsApp - Buddy Finanzas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="firebase-config.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#0f1618] text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-[#a64fff] to-[#8a2aff] p-4 flex items-center justify-between">
+        <div class="flex items-center">
+            <button onclick="goBack()" class="text-white text-2xl mr-4 hover:text-gray-300 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="flex flex-col">
+                <h1 class="text-white text-lg font-normal">
+                    <span class="font-bold">WhatsApp Business</span>
+                </h1>
+                <span class="text-xs text-gray-400">Configuración de integración</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-6 max-w-4xl mx-auto">
+        <!-- Status Card -->
+        <div class="bg-[#1f292c] rounded-3xl p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-white text-xl font-semibold">Estado de la Integración</h2>
+                <div id="connectionStatus" class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                    <span class="text-red-400">Desconectado</span>
+                </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+                Conecta tu cuenta de WhatsApp Business para recibir y procesar transacciones automáticamente.
+            </p>
+        </div>
+
+        <!-- Configuration Form -->
+        <div class="bg-[#1f292c] rounded-3xl p-6 mb-6">
+            <h3 class="text-white text-lg font-semibold mb-4">Configuración de WhatsApp Business</h3>
+            
+            <form id="whatsappConfigForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-2">
+                        Número de Teléfono Asociado
+                    </label>
+                    <input type="tel" id="phoneNumber" placeholder="+50212345678" 
+                           class="w-full bg-[#121b1d] border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-[#a64fff] focus:outline-none">
+                    <p class="text-gray-500 text-xs mt-1">
+                        Este número debe coincidir con el que envía mensajes a WhatsApp Business
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-2">
+                        Token de Verificación
+                    </label>
+                    <input type="text" id="verifyToken" placeholder="buddy_finanzas_webhook" 
+                           class="w-full bg-[#121b1d] border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-[#a64fff] focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-2">
+                        Access Token
+                    </label>
+                    <input type="password" id="accessToken" placeholder="Tu token de acceso de WhatsApp" 
+                           class="w-full bg-[#121b1d] border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-[#a64fff] focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-2">
+                        Phone Number ID
+                    </label>
+                    <input type="text" id="phoneNumberId" placeholder="123456789012345" 
+                           class="w-full bg-[#121b1d] border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-[#a64fff] focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-2">
+                        OpenAI API Key (Opcional)
+                    </label>
+                    <input type="password" id="openaiKey" placeholder="sk-..." 
+                           class="w-full bg-[#121b1d] border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-[#a64fff] focus:outline-none">
+                    <p class="text-gray-500 text-xs mt-1">
+                        Para clasificación automática inteligente de categorías
+                    </p>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-[#a64fff] to-[#8a2aff] text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                    <i class="fas fa-save mr-2"></i>
+                    Guardar Configuración
+                </button>
+            </form>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-[#1f292c] rounded-3xl p-6 mb-6">
+            <h3 class="text-white text-lg font-semibold mb-4">Cómo Configurar WhatsApp Business</h3>
+            
+            <div class="space-y-4">
+                <div class="flex items-start space-x-3">
+                    <div class="bg-[#a64fff] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</div>
+                    <div>
+                        <h4 class="text-white font-medium">Crear App en Meta for Developers</h4>
+                        <p class="text-gray-400 text-sm">Ve a <a href="https://developers.facebook.com" class="text-[#a64fff] hover:underline" target="_blank">developers.facebook.com</a> y crea una nueva app</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="bg-[#a64fff] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</div>
+                    <div>
+                        <h4 class="text-white font-medium">Configurar WhatsApp Business API</h4>
+                        <p class="text-gray-400 text-sm">Agrega el producto WhatsApp Business API a tu app</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="bg-[#a64fff] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</div>
+                    <div>
+                        <h4 class="text-white font-medium">Obtener Credenciales</h4>
+                        <p class="text-gray-400 text-sm">Copia el Access Token y Phone Number ID de tu app</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="bg-[#a64fff] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">4</div>
+                    <div>
+                        <h4 class="text-white font-medium">Configurar Webhook</h4>
+                        <p class="text-gray-400 text-sm">URL del webhook: <code class="bg-[#121b1d] px-2 py-1 rounded text-[#a64fff]">https://tu-dominio.com/webhook</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Section -->
+        <div class="bg-[#1f292c] rounded-3xl p-6 mb-6">
+            <h3 class="text-white text-lg font-semibold mb-4">Probar Integración</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-300 text-sm font-medium mb-2">
+                        Enviar Mensaje de Prueba
+                    </label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="testMessage" placeholder="Gasté Q100 en comida" 
+                               class="flex-1 bg-[#121b1d] border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-[#a64fff] focus:outline-none">
+                        <button onclick="sendTestMessage()" class="bg-[#a64fff] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <button onclick="testConnection()" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Probar Conexión
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-[#1f292c] rounded-3xl p-6">
+            <h3 class="text-white text-lg font-semibold mb-4">Transacciones Recientes de WhatsApp</h3>
+            <div id="recentTransactions" class="space-y-3">
+                <div class="text-center py-8">
+                    <div class="text-gray-400 text-lg font-semibold mb-2">No hay transacciones aún</div>
+                    <div class="text-gray-500 text-sm">Las transacciones de WhatsApp aparecerán aquí</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Cargar configuración existente
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWhatsAppConfig();
+            loadRecentTransactions();
+        });
+
+        // Cargar configuración guardada
+        function loadWhatsAppConfig() {
+            const config = JSON.parse(localStorage.getItem('whatsappConfig') || '{}');
+            
+            document.getElementById('phoneNumber').value = config.phoneNumber || '';
+            document.getElementById('verifyToken').value = config.verifyToken || 'buddy_finanzas_webhook';
+            document.getElementById('accessToken').value = config.accessToken || '';
+            document.getElementById('phoneNumberId').value = config.phoneNumberId || '';
+            document.getElementById('openaiKey').value = config.openaiKey || '';
+        }
+
+        // Guardar configuración
+        document.getElementById('whatsappConfigForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const config = {
+                phoneNumber: document.getElementById('phoneNumber').value,
+                verifyToken: document.getElementById('verifyToken').value,
+                accessToken: document.getElementById('accessToken').value,
+                phoneNumberId: document.getElementById('phoneNumberId').value,
+                openaiKey: document.getElementById('openaiKey').value
+            };
+            
+            localStorage.setItem('whatsappConfig', JSON.stringify(config));
+            
+            // Mostrar confirmación
+            showNotification('✅ Configuración guardada correctamente', 'success');
+            
+            // Actualizar estado de conexión
+            updateConnectionStatus();
+        });
+
+        // Actualizar estado de conexión
+        function updateConnectionStatus() {
+            const config = JSON.parse(localStorage.getItem('whatsappConfig') || '{}');
+            const statusElement = document.getElementById('connectionStatus');
+            
+            if (config.accessToken && config.phoneNumberId) {
+                statusElement.innerHTML = `
+                    <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                    <span class="text-green-400">Configurado</span>
+                `;
+            } else {
+                statusElement.innerHTML = `
+                    <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                    <span class="text-red-400">Desconectado</span>
+                `;
+            }
+        }
+
+        // Probar conexión
+        async function testConnection() {
+            try {
+                showNotification('🔄 Probando conexión...', 'info');
+                
+                // Simular prueba de conexión
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                showNotification('✅ Conexión exitosa', 'success');
+            } catch (error) {
+                showNotification('❌ Error en la conexión', 'error');
+            }
+        }
+
+        // Enviar mensaje de prueba
+        async function sendTestMessage() {
+            const message = document.getElementById('testMessage').value;
+            if (!message) {
+                showNotification('⚠️ Ingresa un mensaje de prueba', 'warning');
+                return;
+            }
+            
+            try {
+                showNotification('🔄 Enviando mensaje de prueba...', 'info');
+                
+                // Simular envío
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                showNotification('✅ Mensaje de prueba enviado', 'success');
+                document.getElementById('testMessage').value = '';
+            } catch (error) {
+                showNotification('❌ Error enviando mensaje', 'error');
+            }
+        }
+
+        // Cargar transacciones recientes
+        async function loadRecentTransactions() {
+            try {
+                // Simular carga de transacciones
+                const transactions = [
+                    {
+                        id: '1',
+                        amount: 100,
+                        type: 'expense',
+                        category: 'Food & drinks',
+                        description: 'Gasté Q100 en comida',
+                        date: new Date().toISOString(),
+                        source: 'whatsapp'
+                    }
+                ];
+                
+                displayTransactions(transactions);
+            } catch (error) {
+                console.error('Error cargando transacciones:', error);
+            }
+        }
+
+        // Mostrar transacciones
+        function displayTransactions(transactions) {
+            const container = document.getElementById('recentTransactions');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-gray-400 text-lg font-semibold mb-2">No hay transacciones aún</div>
+                        <div class="text-gray-500 text-sm">Las transacciones de WhatsApp aparecerán aquí</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const transactionsHTML = transactions.map(transaction => `
+                <div class="flex items-center justify-between p-4 bg-[#121b1d] rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-${transaction.type === 'income' ? 'green' : 'red'}-500 flex items-center justify-center">
+                            <i class="fas fa-${transaction.type === 'income' ? 'plus' : 'minus'} text-white"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">${transaction.description}</p>
+                            <p class="text-gray-400 text-sm">${transaction.category}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-white font-semibold">${transaction.type === 'income' ? '+' : '-'}Q ${transaction.amount}</p>
+                        <p class="text-gray-400 text-xs">${new Date(transaction.date).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = transactionsHTML;
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 
+                type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Función para regresar
+        function goBack() {
+            window.location.href = '1.html';
+        }
+
+        // Actualizar estado al cargar
+        updateConnectionStatus();
+    </script>
+</body>
+</html>

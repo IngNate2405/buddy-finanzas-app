@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buddy Finanzas - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body class="bg-[#0f1618] text-white min-h-screen flex flex-col items-center justify-center">
+  <!-- Container -->
+  <div class="w-full max-w-md rounded-3xl bg-[#2A3134] p-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-gradient-to-r from-[#a64fff] to-[#8a2aff] rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-wallet text-white text-2xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-white mb-2">Buddy Finanzas</h1>
+      <p class="text-gray-400 text-sm">Gestiona tus finanzas personales</p>
+      <span class="text-xs text-gray-500">v2.3.3</span>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-6">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          class="w-full px-4 py-3 bg-[#1B1F20] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#a64fff] transition-colors"
+          placeholder="tu@email.com"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+          Contraseña
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          class="w-full px-4 py-3 bg-[#1B1F20] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#a64fff] transition-colors"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <button
+        type="submit"
+        id="loginBtn"
+        class="w-full bg-gradient-to-r from-[#a64fff] to-[#8a2aff] text-white py-3 rounded-lg font-semibold hover:from-[#8a2aff] hover:to-[#a64fff] transition-all duration-300 flex items-center justify-center"
+      >
+        <i class="fas fa-sign-in-alt mr-2"></i>
+        Iniciar Sesión
+      </button>
+    </form>
+
+    <!-- Sign Up Form (Hidden by default) -->
+    <form id="signupForm" class="space-y-6 hidden">
+      <div>
+        <label for="signupEmail" class="block text-sm font-medium text-gray-300 mb-2">
+          Email
+        </label>
+        <input
+          type="email"
+          id="signupEmail"
+          name="signupEmail"
+          required
+          class="w-full px-4 py-3 bg-[#1B1F20] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#a64fff] transition-colors"
+          placeholder="tu@email.com"
+        />
+      </div>
+
+      <div>
+        <label for="signupPassword" class="block text-sm font-medium text-gray-300 mb-2">
+          Contraseña
+        </label>
+        <input
+          type="password"
+          id="signupPassword"
+          name="signupPassword"
+          required
+          minlength="6"
+          class="w-full px-4 py-3 bg-[#1B1F20] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#a64fff] transition-colors"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-300 mb-2">
+          Confirmar Contraseña
+        </label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          required
+          minlength="6"
+          class="w-full px-4 py-3 bg-[#1B1F20] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#a64fff] transition-colors"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <button
+        type="submit"
+        id="signupBtn"
+        class="w-full bg-gradient-to-r from-[#a64fff] to-[#8a2aff] text-white py-3 rounded-lg font-semibold hover:from-[#8a2aff] hover:to-[#a64fff] transition-all duration-300 flex items-center justify-center"
+      >
+        <i class="fas fa-user-plus mr-2"></i>
+        Crear Cuenta
+      </button>
+    </form>
+
+    <!-- Toggle between login and signup -->
+    <div class="text-center mt-6">
+      <button
+        id="toggleForm"
+        class="text-[#a64fff] hover:text-[#8a2aff] text-sm font-medium transition-colors"
+      >
+        ¿No tienes cuenta? Crear una nueva
+      </button>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="messageContainer" class="mt-4 hidden">
+      <div id="message" class="p-3 rounded-lg text-sm"></div>
+    </div>
+  </div>
+
+  <script>
+    class LoginManager {
+      constructor() {
+        this.isSignupMode = false;
+        this.firebaseService = null;
+        this.init();
+      }
+
+      async init() {
+        // Wait for Firebase to load
+        await new Promise(resolve => {
+          if (window.FirebaseService) {
+            resolve();
+          } else {
+            const checkFirebase = setInterval(() => {
+              if (window.FirebaseService) {
+                clearInterval(checkFirebase);
+                resolve();
+              }
+            }, 100);
+          }
+        });
+
+        this.firebaseService = new window.FirebaseService();
+        this.bindEvents();
+        this.checkAuthState();
+      }
+
+      bindEvents() {
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleLogin();
+        });
+
+        // Signup form
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleSignup();
+        });
+
+        // Toggle form
+        document.getElementById('toggleForm').addEventListener('click', () => {
+          this.toggleForm();
+        });
+      }
+
+      async checkAuthState() {
+        // Simple check - if user is already authenticated, redirect
+        try {
+          const user = this.firebaseService.getCurrentUser();
+          if (user) {
+            window.location.href = '1.html';
+          }
+        } catch (error) {
+          // User not authenticated, stay on login page
+        }
+      }
+
+      async handleLogin() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const loginBtn = document.getElementById('loginBtn');
+
+        try {
+          loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Iniciando...';
+          loginBtn.disabled = true;
+
+          await this.firebaseService.signIn(email, password);
+          this.showMessage('Inicio de sesión exitoso', 'success');
+          
+          // Redirect will happen automatically via auth state change
+        } catch (error) {
+          this.showMessage(this.getErrorMessage(error.code), 'error');
+        } finally {
+          loginBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión';
+          loginBtn.disabled = false;
+        }
+      }
+
+      async handleSignup() {
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const signupBtn = document.getElementById('signupBtn');
+
+        if (password !== confirmPassword) {
+          this.showMessage('Las contraseñas no coinciden', 'error');
+          return;
+        }
+
+        if (password.length < 6) {
+          this.showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+          return;
+        }
+
+        try {
+          signupBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creando...';
+          signupBtn.disabled = true;
+
+          await this.firebaseService.signUp(email, password);
+          this.showMessage('Cuenta creada exitosamente', 'success');
+          
+          // Redirect will happen automatically via auth state change
+        } catch (error) {
+          this.showMessage(this.getErrorMessage(error.code), 'error');
+        } finally {
+          signupBtn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Crear Cuenta';
+          signupBtn.disabled = false;
+        }
+      }
+
+      toggleForm() {
+        this.isSignupMode = !this.isSignupMode;
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const toggleBtn = document.getElementById('toggleForm');
+
+        if (this.isSignupMode) {
+          loginForm.classList.add('hidden');
+          signupForm.classList.remove('hidden');
+          toggleBtn.textContent = '¿Ya tienes cuenta? Iniciar sesión';
+        } else {
+          signupForm.classList.add('hidden');
+          loginForm.classList.remove('hidden');
+          toggleBtn.textContent = '¿No tienes cuenta? Crear una nueva';
+        }
+
+        this.hideMessage();
+      }
+
+      showMessage(message, type) {
+        const container = document.getElementById('messageContainer');
+        const messageEl = document.getElementById('message');
+        
+        messageEl.textContent = message;
+        messageEl.className = `p-3 rounded-lg text-sm ${
+          type === 'success' 
+            ? 'bg-green-600 text-white' 
+            : 'bg-red-600 text-white'
+        }`;
+        
+        container.classList.remove('hidden');
+      }
+
+      hideMessage() {
+        document.getElementById('messageContainer').classList.add('hidden');
+      }
+
+      getErrorMessage(errorCode) {
+        const errorMessages = {
+          'auth/user-not-found': 'No existe una cuenta con este email',
+          'auth/wrong-password': 'Contraseña incorrecta',
+          'auth/email-already-in-use': 'Ya existe una cuenta con este email',
+          'auth/weak-password': 'La contraseña es muy débil',
+          'auth/invalid-email': 'Email inválido',
+          'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
+          'auth/network-request-failed': 'Error de conexión. Verifica tu internet'
+        };
+        
+        return errorMessages[errorCode] || 'Error inesperado. Intenta de nuevo';
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      new LoginManager();
+    });
+  </script>
+</body>
+</html>
