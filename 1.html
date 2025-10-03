@@ -1740,14 +1740,6 @@
     // Firebase integration
     async function initializeFirebase() {
       try {
-        // Check if user is logged in (simple check)
-        const userEmail = localStorage.getItem('userEmail');
-        if (!userEmail) {
-          // User is not logged in, redirect to login
-          window.location.href = 'login.html';
-          return;
-        }
-
         // Wait for Firebase to load
         await new Promise(resolve => {
           if (window.FirebaseService) {
@@ -1763,7 +1755,12 @@
         });
 
         const firebaseService = new window.FirebaseService();
-        
+        const user = firebaseService.getCurrentUser();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
         // User is logged in, continue with app initialization
         initializeAppData(firebaseService);
         

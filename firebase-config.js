@@ -12,7 +12,7 @@ const firebaseConfig = {
 // Initialize Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 let app, db, auth;
 
@@ -20,6 +20,12 @@ try {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
   auth = getAuth(app);
+  try {
+    // Ensure session persists across tabs/reloads
+    await setPersistence(auth, browserLocalPersistence);
+  } catch (e) {
+    console.error('No se pudo establecer persistencia de sesión:', e);
+  }
 } catch (error) {
   console.error('Error initializing Firebase:', error);
   // Fallback configuration for development
