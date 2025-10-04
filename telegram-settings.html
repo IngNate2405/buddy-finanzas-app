@@ -161,20 +161,25 @@
 
                 // Wait for real auth state before deciding (handle initial null) - same as 1.html
                 firebaseService.onAuthStateChanged((user) => {
+                    console.log('Auth state changed in telegram-settings:', user ? user.email : 'No user');
                     if (user) {
                         console.log('User authenticated:', user.email);
                         currentUser = user;
                         // Hide loading overlay
                         document.getElementById('loadingOverlay').style.display = 'none';
+                        console.log('About to check Telegram connection...');
                         checkTelegramConnection();
                     } else {
+                        console.log('No user in auth state, starting retry...');
                         setTimeout(() => {
                             const retryUser = firebaseService.getCurrentUser();
+                            console.log('Retry user:', retryUser ? retryUser.email : 'No user');
                             if (retryUser) {
                                 console.log('User found on retry:', retryUser.email);
                                 currentUser = retryUser;
                                 // Hide loading overlay
                                 document.getElementById('loadingOverlay').style.display = 'none';
+                                console.log('About to check Telegram connection on retry...');
                                 checkTelegramConnection();
                             } else {
                                 console.log('No user found, redirecting to login');
@@ -196,6 +201,16 @@
 
         async function checkTelegramConnection() {
             try {
+                console.log('Checking Telegram connection...');
+                console.log('firebaseService:', firebaseService);
+                console.log('currentUser:', currentUser);
+                
+                if (!firebaseService || !currentUser) {
+                    console.error('Firebase service or user not available');
+                    updateConnectionStatus(false);
+                    return;
+                }
+
                 // Check if user has Telegram linked
                 const telegramLink = await firebaseService.db.collection('telegram_users')
                     .where('firebaseUserId', '==', currentUser.uid)
@@ -203,8 +218,10 @@
 
                 if (!telegramLink.empty) {
                     const linkData = telegramLink.docs[0].data();
+                    console.log('Telegram link found:', linkData);
                     updateConnectionStatus(true, linkData.telegramChatId);
                 } else {
+                    console.log('No Telegram link found');
                     updateConnectionStatus(false);
                 }
             } catch (error) {
