@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.8.1 - Firebase Fix</span>
+            <span class="text-xs text-gray-400">v2.8.3 - Telegram Fix</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -435,9 +435,18 @@
           console.log('💾 Transacciones en Firebase:', savedTransactions.length);
         
         // Filter transactions for current month/year
-        const monthTransactions = savedTransactions.filter(t => 
-          t.month === month && t.year === year
-        );
+        const monthTransactions = savedTransactions.filter(t => {
+          // Handle both old format (month/year fields) and new format (date field)
+          if (t.month !== undefined && t.year !== undefined) {
+            // Old format: direct month/year fields
+            return t.month === month && t.year === year;
+          } else if (t.date) {
+            // New format: date field (from Telegram bot)
+            const transactionDate = new Date(t.date);
+            return transactionDate.getMonth() === month && transactionDate.getFullYear() === year;
+          }
+          return false;
+        });
           console.log('📅 Transacciones del mes actual:', monthTransactions.length);
         
         // Convert to display format
