@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Telegram - Buddy Finanzas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="firebase-config.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#0f1618] text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-[#a64fff] to-[#8a2aff] p-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <button onclick="goBack()" class="text-white text-2xl hover:text-gray-300 transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="text-white text-xl font-bold">Configuración Telegram</h1>
+            </div>
+            <span class="text-xs text-gray-400">v2.8.0 - Clean App</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-6 max-w-4xl mx-auto">
+        <!-- Status Card -->
+        <div class="bg-[#1a1f2e] rounded-lg p-6 mb-6">
+            <div class="flex items-center space-x-3 mb-4">
+                <i class="fab fa-telegram text-3xl text-blue-400"></i>
+                <div>
+                    <h2 class="text-xl font-bold">Buddy Finanzas Bot</h2>
+                    <p class="text-gray-400">Conecta tu cuenta con Telegram</p>
+                </div>
+            </div>
+            
+            <div id="connectionStatus" class="mb-4">
+                <div class="flex items-center space-x-2">
+                    <div id="statusIndicator" class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <span id="statusText" class="text-yellow-400">No conectado</span>
+                </div>
+            </div>
+
+            <div class="bg-[#0f1618] rounded-lg p-4">
+                <h3 class="font-semibold mb-2">📱 Cómo conectar:</h3>
+                <ol class="list-decimal list-inside space-y-2 text-sm text-gray-300">
+                    <li>Busca <code class="bg-gray-700 px-2 py-1 rounded">@buddy_finanzas_bot</code> en Telegram</li>
+                    <li>Inicia una conversación con el bot</li>
+                    <li>Envía el comando: <code class="bg-gray-700 px-2 py-1 rounded">/start</code></li>
+                    <li>El bot te dará un código de vinculación</li>
+                    <li>Ingresa el código aquí abajo</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Link Form -->
+        <div class="bg-[#1a1f2e] rounded-lg p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">🔗 Vincular Cuenta</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Código de vinculación
+                    </label>
+                    <input 
+                        type="text" 
+                        id="linkCode" 
+                        placeholder="Ingresa el código que te dio el bot (ej: 830950655)"
+                        class="w-full px-4 py-3 bg-[#0f1618] border border-gray-600 rounded-lg focus:border-[#a64fff] focus:outline-none"
+                    >
+                </div>
+                
+                <button 
+                    id="linkButton"
+                    onclick="linkTelegramAccount()"
+                    class="w-full bg-gradient-to-r from-[#a64fff] to-[#8a2aff] text-white py-3 px-6 rounded-lg font-semibold hover:from-[#8a2aff] hover:to-[#6b1fcc] transition-all duration-200"
+                >
+                    <i class="fas fa-link mr-2"></i>
+                    Vincular Cuenta
+                </button>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-[#1a1f2e] rounded-lg p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">📝 Cómo usar el bot</h3>
+            
+            <div class="space-y-4">
+                <div class="bg-[#0f1618] rounded-lg p-4">
+                    <h4 class="font-semibold text-green-400 mb-2">💰 Registrar Gastos:</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• "Gasté Q50 en comida"</li>
+                        <li>• "Pagué Q200 de renta"</li>
+                        <li>• "Compré Q30 en supermercado"</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-[#0f1618] rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-400 mb-2">💵 Registrar Ingresos:</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• "Recibí Q3000 de salario"</li>
+                        <li>• "Gané Q500 de venta"</li>
+                        <li>• "Ingresó Q100 de inversión"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unlink Section -->
+        <div class="bg-[#1a1f2e] rounded-lg p-6">
+            <h3 class="text-lg font-semibold mb-4 text-red-400">⚠️ Desvincular Cuenta</h3>
+            <p class="text-gray-400 mb-4">Si quieres desconectar tu cuenta de Telegram:</p>
+            <button 
+                id="unlinkButton"
+                onclick="unlinkTelegramAccount()"
+                class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+            >
+                <i class="fas fa-unlink mr-2"></i>
+                Desvincular
+            </button>
+        </div>
+    </main>
+
+    <script>
+        let firebaseService = null;
+        let currentUser = null;
+
+        // Initialize Firebase
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Wait for Firebase to be ready
+                let retries = 0;
+                while (!window.firebaseServiceInstance && retries < 10) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    retries++;
+                }
+
+                if (window.firebaseServiceInstance) {
+                    firebaseService = window.firebaseServiceInstance;
+                    
+                    // Check authentication
+                    firebaseService.auth.onAuthStateChanged((user) => {
+                        if (user) {
+                            currentUser = user;
+                            checkTelegramConnection();
+                        } else {
+                            window.location.href = 'login.html';
+                        }
+                    });
+                } else {
+                    console.error('Firebase service not available');
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error initializing:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        function goBack() {
+            window.location.href = '1.html';
+        }
+
+        async function checkTelegramConnection() {
+            try {
+                // Check if user has Telegram linked
+                const telegramLink = await firebaseService.db.collection('telegram_users')
+                    .where('firebaseUserId', '==', currentUser.uid)
+                    .get();
+
+                if (!telegramLink.empty) {
+                    const linkData = telegramLink.docs[0].data();
+                    updateConnectionStatus(true, linkData.telegramChatId);
+                } else {
+                    updateConnectionStatus(false);
+                }
+            } catch (error) {
+                console.error('Error checking Telegram connection:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        function updateConnectionStatus(connected, chatId = null) {
+            const indicator = document.getElementById('statusIndicator');
+            const text = document.getElementById('statusText');
+            const linkButton = document.getElementById('linkButton');
+            const unlinkButton = document.getElementById('unlinkButton');
+
+            if (connected) {
+                indicator.className = 'w-3 h-3 rounded-full bg-green-500';
+                text.textContent = `Conectado (Chat ID: ${chatId})`;
+                text.className = 'text-green-400';
+                linkButton.style.display = 'none';
+                unlinkButton.style.display = 'inline-block';
+            } else {
+                indicator.className = 'w-3 h-3 rounded-full bg-yellow-500';
+                text.textContent = 'No conectado';
+                text.className = 'text-yellow-400';
+                linkButton.style.display = 'inline-block';
+                unlinkButton.style.display = 'none';
+            }
+        }
+
+        async function linkTelegramAccount() {
+            const linkCode = document.getElementById('linkCode').value.trim();
+            
+            if (!linkCode) {
+                alert('Por favor ingresa el código de vinculación');
+                return;
+            }
+
+            try {
+                // Save the link to Firestore
+                await firebaseService.db.collection('telegram_users').add({
+                    firebaseUserId: currentUser.uid,
+                    telegramChatId: linkCode,
+                    linkedAt: new Date(),
+                    userEmail: currentUser.email
+                });
+
+                alert('✅ Cuenta vinculada exitosamente!');
+                checkTelegramConnection();
+                document.getElementById('linkCode').value = '';
+                
+            } catch (error) {
+                console.error('Error linking account:', error);
+                alert('❌ Error vinculando la cuenta. Intenta de nuevo.');
+            }
+        }
+
+        async function unlinkTelegramAccount() {
+            if (!confirm('¿Estás seguro de que quieres desvincular tu cuenta de Telegram?')) {
+                return;
+            }
+
+            try {
+                // Remove the link from Firestore
+                const telegramLink = await firebaseService.db.collection('telegram_users')
+                    .where('firebaseUserId', '==', currentUser.uid)
+                    .get();
+
+                if (!telegramLink.empty) {
+                    await telegramLink.docs[0].ref.delete();
+                }
+
+                alert('✅ Cuenta desvinculada exitosamente!');
+                checkTelegramConnection();
+                
+            } catch (error) {
+                console.error('Error unlinking account:', error);
+                alert('❌ Error desvinculando la cuenta. Intenta de nuevo.');
+            }
+        }
+    </script>
+</body>
+</html>
