@@ -46,14 +46,10 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-          <span class="text-xs text-gray-400">v2.7.0 - Netlify Deploy</span>
+          <span class="text-xs text-gray-400">v2.8.0 - Clean App</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
-    <button id="telegramBtn" aria-label="Telegram Settings" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Configuración Telegram" onclick="openTelegramSettings()">
-     <i class="fab fa-telegram">
-     </i>
-    </button>
     <button id="logoutBtn" aria-label="Logout" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Cerrar Sesión">
      <i class="fas fa-sign-out-alt">
      </i>
@@ -1659,14 +1655,6 @@
     }
 
 
-    // Function to open Telegram settings
-    function openTelegramSettings() {
-        try {
-            window.location.href = 'telegram-settings.html';
-        } catch (error) {
-            console.error('❌ Error abriendo configuración de Telegram:', error);
-        }
-    }
 
     // Initialize the month navigator when the page loads
     window.monthNavigator = null;

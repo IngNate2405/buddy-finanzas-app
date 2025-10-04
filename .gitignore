@@ -56,11 +56,11 @@ build/
 # WhatsApp Webhook (separate repository)
 buddy-finanzas-whatsapp/
 
-# Telegram Bot
-telegram-config.env
-telegram-token.txt
-telegram_config.env
-*.session
-*.session-journal
-buddy_finanzas_session.session
-buddy_finanzas_session.session-journal
+# Telegram Bot (moved to separate repository)
+# telegram-config.env
+# telegram-token.txt
+# telegram_config.env
+# *.session
+# *.session-journal
+# buddy_finanzas_session.session
+# buddy_finanzas_session.session-journal
