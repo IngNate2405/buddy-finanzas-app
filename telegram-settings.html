@@ -161,9 +161,10 @@
                 window.firebaseServiceInstance = firebaseService;
                 
                 // Verify Firebase is properly initialized
-                console.log('Firebase service created:', firebaseService);
-                console.log('Firebase db available:', firebaseService.db);
-                console.log('Firebase auth available:', firebaseService.auth);
+                console.log('🔥 NEW VERSION - Firebase service created:', firebaseService);
+                console.log('🔥 NEW VERSION - Firebase db available:', firebaseService.db);
+                console.log('🔥 NEW VERSION - Firebase auth available:', firebaseService.auth);
+                console.log('🔥 NEW VERSION - Timestamp:', new Date().toISOString());
 
                 // Wait for real auth state before deciding (handle initial null) - same as 2.html
                 firebaseService.onAuthStateChanged((user) => {
@@ -210,10 +211,10 @@
 
         async function checkTelegramConnection() {
             try {
-                console.log('Checking Telegram connection...');
-                console.log('firebaseService (local):', firebaseService);
-                console.log('firebaseService (global):', window.firebaseServiceInstance);
-                console.log('currentUser:', currentUser);
+                console.log('🔥 NEW VERSION - Checking Telegram connection...');
+                console.log('🔥 NEW VERSION - firebaseService (local):', firebaseService);
+                console.log('🔥 NEW VERSION - firebaseService (global):', window.firebaseServiceInstance);
+                console.log('🔥 NEW VERSION - currentUser:', currentUser);
                 
                 // Use global instance instead of local variable
                 const service = window.firebaseServiceInstance || firebaseService;
