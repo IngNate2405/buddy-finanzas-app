@@ -28,6 +28,14 @@
         </div>
     </header>
 
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-[#1a1f2e] rounded-lg p-6 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a64fff] mx-auto mb-4"></div>
+            <p class="text-white">Conectando con tu sesión...</p>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="p-6 max-w-4xl mx-auto">
         <!-- Status Card -->
@@ -136,7 +144,7 @@
             try {
                 // Wait for Firebase to be ready
                 let retries = 0;
-                while (!window.firebaseServiceInstance && retries < 10) {
+                while (!window.firebaseServiceInstance && retries < 20) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     retries++;
                 }
@@ -144,12 +152,27 @@
                 if (window.firebaseServiceInstance) {
                     firebaseService = window.firebaseServiceInstance;
                     
-                    // Check authentication
+                    // Check authentication with timeout
+                    let authChecked = false;
+                    const authTimeout = setTimeout(() => {
+                        if (!authChecked) {
+                            console.log('Auth timeout, redirecting to login');
+                            window.location.href = 'login.html';
+                        }
+                    }, 5000);
+
                     firebaseService.auth.onAuthStateChanged((user) => {
+                        authChecked = true;
+                        clearTimeout(authTimeout);
+                        
                         if (user) {
+                            console.log('User authenticated:', user.email);
                             currentUser = user;
+                            // Hide loading overlay
+                            document.getElementById('loadingOverlay').style.display = 'none';
                             checkTelegramConnection();
                         } else {
+                            console.log('No user authenticated, redirecting to login');
                             window.location.href = 'login.html';
                         }
                     });
