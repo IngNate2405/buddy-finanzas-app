@@ -139,10 +139,10 @@
         let firebaseService = null;
         let currentUser = null;
 
-        // Initialize Firebase - Same logic as 1.html
+        // Initialize Firebase - Same logic as 2.html with shared session
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // Wait for Firebase to load - same as 1.html
+                // Wait for Firebase to load - same as 2.html
                 await new Promise(resolve => {
                     if (window.FirebaseService) {
                         resolve();
@@ -156,36 +156,40 @@
                     }
                 });
 
-                const firebaseService = new window.FirebaseService();
+                // Use existing instance if available (shared session) - same as 2.html
+                const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
                 window.firebaseServiceInstance = firebaseService;
 
-                // Wait for real auth state before deciding (handle initial null) - same as 1.html
+                // Wait for real auth state before deciding (handle initial null) - same as 2.html
                 firebaseService.onAuthStateChanged((user) => {
                     console.log('Auth state changed in telegram-settings:', user ? user.email : 'No user');
                     if (user) {
                         console.log('User authenticated:', user.email);
                         currentUser = user;
+                        window.isAuthReady = true;
                         // Hide loading overlay
                         document.getElementById('loadingOverlay').style.display = 'none';
                         console.log('About to check Telegram connection...');
                         checkTelegramConnection();
                     } else {
                         console.log('No user in auth state, starting retry...');
-                        setTimeout(() => {
+                        // Keep overlay visible and continue polling - same as 2.html
+                        const poll = () => {
                             const retryUser = firebaseService.getCurrentUser();
-                            console.log('Retry user:', retryUser ? retryUser.email : 'No user');
+                            console.log('Polling check - retryUser:', retryUser ? retryUser.email : 'No user');
                             if (retryUser) {
-                                console.log('User found on retry:', retryUser.email);
+                                console.log('User found via polling:', retryUser.email);
                                 currentUser = retryUser;
-                                // Hide loading overlay
+                                window.isAuthReady = true;
                                 document.getElementById('loadingOverlay').style.display = 'none';
-                                console.log('About to check Telegram connection on retry...');
+                                console.log('About to check Telegram connection via polling...');
                                 checkTelegramConnection();
                             } else {
-                                console.log('No user found, redirecting to login');
-                                window.location.href = 'login.html';
+                                console.log('Still no user, continuing polling...');
+                                setTimeout(poll, 1000);
                             }
-                        }, 1200);
+                        };
+                        setTimeout(poll, 1200);
                     }
                 });
 
