@@ -139,88 +139,53 @@
         let firebaseService = null;
         let currentUser = null;
 
-        // Initialize Firebase - Same logic as 1.html and 2.html
+        // Initialize Firebase - Same logic as 1.html
         document.addEventListener('DOMContentLoaded', async () => {
-            // Wait for Firebase to be ready
-            let retries = 0;
-            while (!window.firebaseServiceInstance && retries < 20) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                retries++;
-            }
+            try {
+                // Wait for Firebase to load - same as 1.html
+                await new Promise(resolve => {
+                    if (window.FirebaseService) {
+                        resolve();
+                    } else {
+                        const checkFirebase = setInterval(() => {
+                            if (window.FirebaseService) {
+                                clearInterval(checkFirebase);
+                                resolve();
+                            }
+                        }, 100);
+                    }
+                });
 
-            if (window.firebaseServiceInstance) {
-                firebaseService = window.firebaseServiceInstance;
-                
-                // Set global auth ready flag
-                window.isAuthReady = false;
-                
-                // Check if user is already authenticated
-                const initialUser = firebaseService.auth.currentUser;
-                if (initialUser) {
-                    console.log('User already authenticated:', initialUser.email);
-                    currentUser = initialUser;
-                    window.isAuthReady = true;
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    checkTelegramConnection();
-                    return; // Exit early if user is already authenticated
-                }
-                
-                // Listen for auth state changes
-                firebaseService.auth.onAuthStateChanged((user) => {
-                    console.log('Auth state changed:', user ? user.email : 'No user');
+                const firebaseService = new window.FirebaseService();
+                window.firebaseServiceInstance = firebaseService;
+
+                // Wait for real auth state before deciding (handle initial null) - same as 1.html
+                firebaseService.onAuthStateChanged((user) => {
                     if (user) {
                         console.log('User authenticated:', user.email);
                         currentUser = user;
-                        window.isAuthReady = true;
                         // Hide loading overlay
                         document.getElementById('loadingOverlay').style.display = 'none';
                         checkTelegramConnection();
                     } else {
-                        console.log('No user authenticated, redirecting to login');
-                        window.location.href = 'login.html';
+                        setTimeout(() => {
+                            const retryUser = firebaseService.getCurrentUser();
+                            if (retryUser) {
+                                console.log('User found on retry:', retryUser.email);
+                                currentUser = retryUser;
+                                // Hide loading overlay
+                                document.getElementById('loadingOverlay').style.display = 'none';
+                                checkTelegramConnection();
+                            } else {
+                                console.log('No user found, redirecting to login');
+                                window.location.href = 'login.html';
+                            }
+                        }, 1200);
                     }
                 });
-                
-                // Retry mechanism with timeout - same as 1.html and 2.html
-                setTimeout(() => {
-                    if (!window.isAuthReady) {
-                        console.log('Auth not ready after timeout, retrying...');
-                        // Try to get current user directly
-                        const currentUser = firebaseService.auth.currentUser;
-                        if (currentUser) {
-                            console.log('Found current user:', currentUser.email);
-                            window.isAuthReady = true;
-                            document.getElementById('loadingOverlay').style.display = 'none';
-                            checkTelegramConnection();
-                        } else {
-                            console.log('No current user found, redirecting to login');
-                            window.location.href = 'login.html';
-                        }
-                    }
-                }, 5000);
-                
-                // Polling loop to check auth status - same as 1.html and 2.html
-                const checkAuthLoop = () => {
-                    if (!window.isAuthReady) {
-                        const currentUser = firebaseService.auth.currentUser;
-                        console.log('Polling check - currentUser:', currentUser ? currentUser.email : 'No user');
-                        if (currentUser) {
-                            console.log('Auth ready via polling:', currentUser.email);
-                            window.isAuthReady = true;
-                            document.getElementById('loadingOverlay').style.display = 'none';
-                            checkTelegramConnection();
-                        } else {
-                            console.log('Still no user, continuing polling...');
-                            setTimeout(checkAuthLoop, 1000);
-                        }
-                    }
-                };
-                
-                // Start polling after a short delay
-                setTimeout(checkAuthLoop, 1000);
-                
-            } else {
-                console.error('Firebase service not available');
+
+            } catch (error) {
+                console.error('Error initializing Firebase:', error);
                 window.location.href = 'login.html';
             }
         });
