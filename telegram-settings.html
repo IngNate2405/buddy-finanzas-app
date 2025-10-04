@@ -156,8 +156,8 @@
                     }
                 });
 
-                // Use existing instance if available (shared session) - same as 2.html
-                const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
+                // Create new instance and assign to global - same as 1.html
+                firebaseService = new window.FirebaseService();
                 window.firebaseServiceInstance = firebaseService;
 
                 // Wait for real auth state before deciding (handle initial null) - same as 2.html
