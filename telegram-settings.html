@@ -159,6 +159,11 @@
                 // Create new instance and assign to global - same as 1.html
                 firebaseService = new window.FirebaseService();
                 window.firebaseServiceInstance = firebaseService;
+                
+                // Verify Firebase is properly initialized
+                console.log('Firebase service created:', firebaseService);
+                console.log('Firebase db available:', firebaseService.db);
+                console.log('Firebase auth available:', firebaseService.auth);
 
                 // Wait for real auth state before deciding (handle initial null) - same as 2.html
                 firebaseService.onAuthStateChanged((user) => {
@@ -269,8 +274,17 @@
             try {
                 // Use global instance
                 const service = window.firebaseServiceInstance || firebaseService;
+                console.log('linkTelegramAccount - service:', service);
+                console.log('linkTelegramAccount - service.db:', service?.db);
+                console.log('linkTelegramAccount - currentUser:', currentUser);
+                
                 if (!service) {
                     alert('❌ Error: Servicio de Firebase no disponible');
+                    return;
+                }
+
+                if (!service.db) {
+                    alert('❌ Error: Base de datos de Firebase no disponible');
                     return;
                 }
 
