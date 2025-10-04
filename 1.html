@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.8.3 - Telegram Fix</span>
+            <span class="text-xs text-gray-400">v2.8.4 - Category Fix</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -482,19 +482,35 @@
           console.log('📋 Categorías cargadas desde Firebase:', Object.keys(categoriesData || {}).length);
           
           if (categoriesData && Object.keys(categoriesData).length > 0) {
-          // Search through all sections for the category
-          for (const [sectionName, categories] of Object.entries(categoriesData)) {
-            const foundCategory = categories.find(cat => cat.name === category);
-            if (foundCategory) {
-                console.log('✅ Categoría encontrada:', foundCategory.name);
+            console.log('📊 Estructura de categorías:', Object.keys(categoriesData));
+            
+            // Check if category exists directly as a key
+            if (categoriesData[category]) {
+              const foundCategory = categoriesData[category];
+              console.log('✅ Categoría encontrada directamente:', category);
               return {
-                name: foundCategory.name,
-                displayName: foundCategory.name,
-                icon: foundCategory.icon,
-                color: foundCategory.color
+                name: category,
+                displayName: category,
+                icon: foundCategory.icon || 'fas fa-question',
+                color: foundCategory.color || 'bg-gray-500'
               };
             }
-          }
+            
+            // Fallback: search through all sections for the category
+            for (const [sectionName, categories] of Object.entries(categoriesData)) {
+              if (Array.isArray(categories)) {
+                const foundCategory = categories.find(cat => cat.name === category);
+                if (foundCategory) {
+                  console.log('✅ Categoría encontrada en sección:', sectionName);
+                  return {
+                    name: foundCategory.name,
+                    displayName: foundCategory.name,
+                    icon: foundCategory.icon,
+                    color: foundCategory.color
+                  };
+                }
+              }
+            }
             console.log('❌ Categoría no encontrada:', category);
           } else {
             console.log('❌ No hay categorías en Firebase');
