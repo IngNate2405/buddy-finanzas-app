@@ -62,3 +62,5 @@ telegram-token.txt
 telegram_config.env
 *.session
 *.session-journal
+buddy_finanzas_session.session
+buddy_finanzas_session.session-journal

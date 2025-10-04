@@ -9,7 +9,8 @@
     "deploy": "echo Deploy to GitHub Pages"
   },
   "dependencies": {
-    "firebase-admin": "^12.0.0"
+    "firebase-admin": "^12.0.0",
+    "telethon": "^1.34.0"
   },
   "devDependencies": {},
   "keywords": [

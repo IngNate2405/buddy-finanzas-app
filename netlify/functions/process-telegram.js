@@ -1,3 +1,50 @@
+// Función para leer mensajes de Telegram
+async function readTelegramMessages() {
+  try {
+    const { spawn } = require('child_process');
+    
+    return new Promise((resolve, reject) => {
+      const python = spawn('python', ['netlify_telegram_reader.py'], {
+        env: {
+          ...process.env,
+          TELEGRAM_API_ID: process.env.TELEGRAM_API_ID,
+          TELEGRAM_API_HASH: process.env.TELEGRAM_API_HASH,
+          TELEGRAM_PHONE: process.env.TELEGRAM_PHONE
+        }
+      });
+      
+      let output = '';
+      
+      python.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      python.stderr.on('data', (data) => {
+        console.error('Python error:', data.toString());
+      });
+      
+      python.on('close', (code) => {
+        if (code === 0) {
+          try {
+            // Parsear la salida del script de Python
+            const messages = JSON.parse(output);
+            resolve(messages);
+          } catch (e) {
+            console.log('No hay mensajes nuevos o error parseando:', e);
+            resolve([]);
+          }
+        } else {
+          console.error('Python script failed with code:', code);
+          resolve([]);
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Error reading Telegram messages:', error);
+    return [];
+  }
+}
+
 exports.handler = async (event, context) => {
   console.log('📱 Procesando mensajes de Telegram...')
   
@@ -27,21 +74,8 @@ exports.handler = async (event, context) => {
     
     const db = admin.firestore()
     
-    // Simular lectura de mensajes (en producción esto vendría del script de Python)
-    const messages = [
-      {
-        id: 1,
-        text: "Gasté Q50 en comida",
-        date: new Date().toISOString(),
-        sender: "user123"
-      },
-      {
-        id: 2,
-        text: "Recibí Q3000 de salario",
-        date: new Date().toISOString(),
-        sender: "user123"
-      }
-    ]
+    // Leer mensajes de Telegram usando la API
+    const messages = await readTelegramMessages()
     
     let processedCount = 0
     
