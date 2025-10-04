@@ -59,3 +59,6 @@ buddy-finanzas-whatsapp/
 # Telegram Bot
 telegram-config.env
 telegram-token.txt
+telegram_config.env
+*.session
+*.session-journal

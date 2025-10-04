@@ -12,3 +12,8 @@
   from = "/health"
   to = "/.netlify/functions/health"
   status = 200
+
+[[redirects]]
+  from = "/process-telegram"
+  to = "/.netlify/functions/process-telegram"
+  status = 200
