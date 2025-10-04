@@ -154,8 +154,20 @@
                 // Set global auth ready flag
                 window.isAuthReady = false;
                 
+                // Check if user is already authenticated
+                const initialUser = firebaseService.auth.currentUser;
+                if (initialUser) {
+                    console.log('User already authenticated:', initialUser.email);
+                    currentUser = initialUser;
+                    window.isAuthReady = true;
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    checkTelegramConnection();
+                    return; // Exit early if user is already authenticated
+                }
+                
                 // Listen for auth state changes
                 firebaseService.auth.onAuthStateChanged((user) => {
+                    console.log('Auth state changed:', user ? user.email : 'No user');
                     if (user) {
                         console.log('User authenticated:', user.email);
                         currentUser = user;
@@ -185,18 +197,20 @@
                             window.location.href = 'login.html';
                         }
                     }
-                }, 3000);
+                }, 5000);
                 
                 // Polling loop to check auth status - same as 1.html and 2.html
                 const checkAuthLoop = () => {
                     if (!window.isAuthReady) {
                         const currentUser = firebaseService.auth.currentUser;
+                        console.log('Polling check - currentUser:', currentUser ? currentUser.email : 'No user');
                         if (currentUser) {
                             console.log('Auth ready via polling:', currentUser.email);
                             window.isAuthReady = true;
                             document.getElementById('loadingOverlay').style.display = 'none';
                             checkTelegramConnection();
                         } else {
+                            console.log('Still no user, continuing polling...');
                             setTimeout(checkAuthLoop, 1000);
                         }
                     }
