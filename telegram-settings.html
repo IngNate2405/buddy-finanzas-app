@@ -33,7 +33,7 @@
                 </button>
                 <h1 class="text-white text-xl font-bold">Configuración Telegram</h1>
             </div>
-            <span class="text-xs text-gray-400">v2.8.1 - Firebase Fix</span>
+            <span class="text-xs text-gray-400">v2.8.2 - Unlink Fix</span>
         </div>
     </header>
 
@@ -336,7 +336,7 @@
                 const telegramLink = await getDocs(q);
 
                 if (!telegramLink.empty) {
-                    await telegramLink.docs[0].ref.delete();
+                    await deleteDoc(telegramLink.docs[0].ref);
                 }
 
                 alert('✅ Cuenta desvinculada exitosamente!');
