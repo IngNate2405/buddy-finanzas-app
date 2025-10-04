@@ -206,17 +206,20 @@
         async function checkTelegramConnection() {
             try {
                 console.log('Checking Telegram connection...');
-                console.log('firebaseService:', firebaseService);
+                console.log('firebaseService (local):', firebaseService);
+                console.log('firebaseService (global):', window.firebaseServiceInstance);
                 console.log('currentUser:', currentUser);
                 
-                if (!firebaseService || !currentUser) {
+                // Use global instance instead of local variable
+                const service = window.firebaseServiceInstance || firebaseService;
+                if (!service || !currentUser) {
                     console.error('Firebase service or user not available');
                     updateConnectionStatus(false);
                     return;
                 }
 
                 // Check if user has Telegram linked
-                const telegramLink = await firebaseService.db.collection('telegram_users')
+                const telegramLink = await service.db.collection('telegram_users')
                     .where('firebaseUserId', '==', currentUser.uid)
                     .get();
 
@@ -264,8 +267,15 @@
             }
 
             try {
+                // Use global instance
+                const service = window.firebaseServiceInstance || firebaseService;
+                if (!service) {
+                    alert('❌ Error: Servicio de Firebase no disponible');
+                    return;
+                }
+
                 // Save the link to Firestore
-                await firebaseService.db.collection('telegram_users').add({
+                await service.db.collection('telegram_users').add({
                     firebaseUserId: currentUser.uid,
                     telegramChatId: linkCode,
                     linkedAt: new Date(),
@@ -288,8 +298,15 @@
             }
 
             try {
+                // Use global instance
+                const service = window.firebaseServiceInstance || firebaseService;
+                if (!service) {
+                    alert('❌ Error: Servicio de Firebase no disponible');
+                    return;
+                }
+
                 // Remove the link from Firestore
-                const telegramLink = await firebaseService.db.collection('telegram_users')
+                const telegramLink = await service.db.collection('telegram_users')
                     .where('firebaseUserId', '==', currentUser.uid)
                     .get();
 
