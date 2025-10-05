@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.10.0 - Debug Function Calls</span>
+            <span class="text-xs text-gray-400">v2.10.1 - Fix Firebase Integration</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -1277,18 +1277,17 @@
         console.log(`Created ${segmentsContainer.children.length} segments`);
       }
 
-      groupCategoriesIntoHeadCategories(categoryTotals) {
+      async groupCategoriesIntoHeadCategories(categoryTotals) {
         console.log('🔍 DEBUG groupCategoriesIntoHeadCategories - categoryTotals:', categoryTotals);
         const headCategories = {};
         
-        // Get categories from localStorage to determine head categories dynamically
-        const savedCategories = localStorage.getItem('categoriesData');
-        console.log('🔍 DEBUG - savedCategories from localStorage:', savedCategories);
+        // Get categories from Firebase instead of localStorage
+        const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
+        const categoriesData = await firebaseService.loadCategories();
+        console.log('🔍 DEBUG - categoriesData from Firebase:', categoriesData);
         
-        if (savedCategories) {
-          const categoriesData = JSON.parse(savedCategories);
-          
-          // Create head categories based on the sections in localStorage
+        if (categoriesData && Object.keys(categoriesData).length > 0) {
+          // Create head categories based on the sections in Firebase
           Object.entries(categoriesData).forEach(([sectionName, categories]) => {
             headCategories[sectionName] = {
               name: sectionName,
@@ -1298,7 +1297,7 @@
             };
           });
         } else {
-          // Fallback to default head categories if localStorage is empty
+          // Fallback to default head categories if Firebase is empty
           headCategories['Miscellaneous'] = {
             name: 'Miscellaneous',
             amount: 0,
@@ -1314,15 +1313,15 @@
         }
         
         // Sum up amounts for each head category based on the section each category belongs to
-        Object.entries(categoryTotals).forEach(([categoryKey, categoryData]) => {
+        for (const [categoryKey, categoryData] of Object.entries(categoryTotals)) {
           console.log('🔍 DEBUG - Procesando categoría:', categoryKey, 'Datos:', categoryData);
           // Skip categories with invalid names (like "0", empty strings, etc.)
           if (!categoryKey || categoryKey === '0' || categoryKey === '' || !categoryData || !categoryData.amount) {
             console.log('🔍 DEBUG - Saltando categoría inválida:', categoryKey);
-            return;
+            continue;
           }
           
-          const headCategoryName = this.getHeadCategoryForCategory(categoryKey);
+          const headCategoryName = await this.getHeadCategoryForCategory(categoryKey);
           console.log('🔍 DEBUG - Categoría principal para', categoryKey, ':', headCategoryName);
           if (headCategories[headCategoryName]) {
             headCategories[headCategoryName].amount += categoryData.amount;
@@ -1330,7 +1329,7 @@
           } else {
             console.log('🔍 DEBUG - No se encontró categoría principal:', headCategoryName);
           }
-        });
+        }
         
         // Return only head categories that have amounts > 0
         const result = Object.values(headCategories).filter(cat => cat.amount > 0);
@@ -1524,13 +1523,12 @@
         return colorMap[sectionName] || 'bg-gray-400';
       }
 
-      getHeadCategoryForCategory(categoryName) {
-        // Get categories from localStorage to find which section this category belongs to
-        const savedCategories = localStorage.getItem('categoriesData');
+      async getHeadCategoryForCategory(categoryName) {
+        // Get categories from Firebase to find which section this category belongs to
+        const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
+        const categoriesData = await firebaseService.loadCategories();
         
-        if (savedCategories) {
-          const categoriesData = JSON.parse(savedCategories);
-          
+        if (categoriesData && Object.keys(categoriesData).length > 0) {
           // Search through all sections for the category
           for (const [sectionName, categories] of Object.entries(categoriesData)) {
             const foundCategory = categories.find(cat => cat.name === categoryName);
@@ -1654,7 +1652,7 @@
         if (tabType === 'head') {
           // Show head categories in the list when head tab is active
           console.log('🔍 DEBUG updateCategoriesListForTab - tabType es head, categoryTotals:', categoryTotals);
-          const headCategories = this.groupCategoriesIntoHeadCategories(categoryTotals);
+          const headCategories = await this.groupCategoriesIntoHeadCategories(categoryTotals);
           console.log('🔍 DEBUG updateCategoriesListForTab - headCategories result:', headCategories);
           this.updateCategoriesListFromHeadCategories(headCategories);
         } else {
