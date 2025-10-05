@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.2 - Debug Mapping</span>
+            <span class="text-xs text-gray-400">v2.9.3 - Debug Call</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -452,6 +452,7 @@
         // Convert to display format
           const displayTransactions = await Promise.all(monthTransactions.map(async (t, index) => {
             console.log('🔍 Procesando transacción:', t.category, 'Tipo:', t.type);
+            console.log('📞 LLAMANDO getCategoryInfo para:', t.category);
             const categoryInfo = await this.getCategoryInfo(t.category);
           return {
             id: t.id || `transaction_${month}_${year}_${index}`, // Add unique ID
@@ -474,7 +475,7 @@
 
       async getCategoryInfo(category) {
         try {
-          console.log('🔍 Buscando categoría en 1.html:', category);
+          console.log('🚀 INICIANDO getCategoryInfo en 1.html con categoría:', category);
           
           // Mapeo inverso: de subcategorías a categorías de Telegram
           const reverseCategoryMap = {
