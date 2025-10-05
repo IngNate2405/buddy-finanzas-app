@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.0 - Fixed Categories</span>
+            <span class="text-xs text-gray-400">v2.9.1 - Display Fix</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -542,10 +542,43 @@
                   console.log('✅ Categoría encontrada en sección en 1.html:', sectionName);
                   return {
                     name: foundCategory.name,
-                    displayName: foundCategory.name,
+                    displayName: foundCategory.name, // Mostrar el nombre de la subcategoría
                     icon: foundCategory.icon,
                     color: foundCategory.color
                   };
+                }
+              }
+            }
+            
+            // Si no se encuentra la categoría exacta, buscar por mapeo de secciones antiguas
+            const oldSectionMap = {
+              'Food & drinks': 'Food',
+              'Transportation': 'Gas',
+              'Entertainment': 'Cinema',
+              'Housing': 'Rent',
+              'Lifestyle': 'Clothing',
+              'Miscellaneous': 'Other',
+              'Income': 'Salary',
+              'Investments': 'Investment'
+            };
+            
+            const mappedCategory = oldSectionMap[category];
+            if (mappedCategory) {
+              console.log('🔄 Mapeando sección antigua en 1.html:', category, '->', mappedCategory);
+              
+              // Search through all sections for the mapped category
+              for (const [sectionName, categories] of Object.entries(categoriesData)) {
+                if (Array.isArray(categories)) {
+                  const foundCategory = categories.find(cat => cat.name === mappedCategory);
+                  if (foundCategory) {
+                    console.log('✅ Categoría mapeada encontrada en sección en 1.html:', sectionName);
+                    return {
+                      name: category, // Mantener el nombre original para compatibilidad
+                      displayName: foundCategory.name, // Mostrar el nombre de la subcategoría
+                      icon: foundCategory.icon,
+                      color: foundCategory.color
+                    };
+                  }
                 }
               }
             }
