@@ -531,6 +531,39 @@
               }
             }
             
+            // Check if it's a Telegram category that needs mapping to subcategory
+            const telegramToSubcategoryMap = {
+              'Food & drinks': 'Food',
+              'Transportation': 'Gas',
+              'Entertainment': 'Cinema',
+              'Housing': 'Rent',
+              'Lifestyle': 'Clothing',
+              'Miscellaneous': 'Other',
+              'Income': 'Salary',
+              'Investments': 'Investment'
+            };
+            
+            const subcategory = telegramToSubcategoryMap[category];
+            if (subcategory) {
+              console.log('🔄 Mapeo directo de Telegram en 1.html:', category, '->', subcategory);
+              
+              // Search through all sections for the subcategory
+              for (const [sectionName, categories] of Object.entries(categoriesData)) {
+                if (Array.isArray(categories)) {
+                  const foundCategory = categories.find(cat => cat.name === subcategory);
+                  if (foundCategory) {
+                    console.log('✅ Subcategoría encontrada en sección en 1.html:', sectionName);
+                    return {
+                      name: category, // Mantener la categoría original
+                      displayName: foundCategory.name, // Mostrar la subcategoría
+                      icon: foundCategory.icon,
+                      color: foundCategory.color
+                    };
+                  }
+                }
+              }
+            }
+            
             // Fallback: search through all sections for the category
             for (const [sectionName, categories] of Object.entries(categoriesData)) {
               if (Array.isArray(categories)) {
