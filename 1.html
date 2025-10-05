@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.4 - Error Debug</span>
+            <span class="text-xs text-gray-400">v2.9.5 - Display Fix</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -456,8 +456,8 @@
             const categoryInfo = await this.getCategoryInfo(t.category);
           return {
             id: t.id || `transaction_${month}_${year}_${index}`, // Add unique ID
-            name: categoryInfo.name,
-            category: categoryInfo.displayName,
+            name: categoryInfo.displayName || categoryInfo.name, // Usar displayName si existe
+            category: categoryInfo.displayName || categoryInfo.name, // Usar displayName si existe
             amount: t.amount,
             type: t.type || 'expense', // Default to expense if type is missing
             icon: categoryInfo.icon,
