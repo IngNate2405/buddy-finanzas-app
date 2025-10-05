@@ -79,7 +79,7 @@
         <h2 id="transactionTitle" class="text-xs tracking-widest uppercase font-normal text-white opacity-70">
           New Transaction
         </h2>
-        <span class="text-xs text-gray-500">v2.8.8 - Reverse Mapping</span>
+        <span class="text-xs text-gray-500">v2.8.9 - Debug Mapping</span>
       </div>
     </div>
 
@@ -385,7 +385,7 @@
             // Check if it's a Telegram category that needs mapping
             const mappedCategory = telegramCategoryMap[categoryName];
             if (mappedCategory) {
-              console.log('🔄 Mapeando categoría de Telegram:', categoryName, '->', mappedCategory);
+              console.log('🔄 Mapeando categoría de Telegram en 2.html:', categoryName, '->', mappedCategory);
               
               // Search through all sections for the mapped category
               for (const [sectionName, categories] of Object.entries(categoriesData)) {
@@ -393,6 +393,7 @@
                   const foundCategory = categories.find(cat => cat.name === mappedCategory);
                   if (foundCategory) {
                     console.log('✅ Categoría mapeada encontrada en sección en 2.html:', sectionName);
+                    console.log('📋 Manteniendo nombre original para guardar:', categoryName);
                     return {
                       name: categoryName, // Mantener el nombre original para guardar
                       displayName: foundCategory.name, // Mostrar el nombre mapeado
