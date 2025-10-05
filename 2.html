@@ -79,7 +79,7 @@
         <h2 id="transactionTitle" class="text-xs tracking-widest uppercase font-normal text-white opacity-70">
           New Transaction
         </h2>
-        <span class="text-xs text-gray-500">v2.9.6 - Remove Bad Mapping</span>
+        <span class="text-xs text-gray-500">v2.10.3 - Fix Category Reset</span>
       </div>
     </div>
 
@@ -314,6 +314,9 @@
           });
         }
         
+        // Check if returning from category selection
+        this.checkForCategorySelection();
+        
         // Show/hide delete button based on mode
         this.updateDeleteButtonVisibility();
         
@@ -443,6 +446,21 @@
         return category;
       }
 
+      saveSelectedCategory(category) {
+        // Save selected category to localStorage
+        localStorage.setItem('selectedCategory', category);
+        this.selectedCategory = category;
+      }
+
+      checkForCategorySelection() {
+        // Check if a category was selected from 4.html
+        const selectedCategory = localStorage.getItem('selectedCategory');
+        if (selectedCategory && selectedCategory !== this.selectedCategory) {
+          this.selectedCategory = selectedCategory;
+          this.updateCategoryDisplay();
+        }
+      }
+
       getSavedAmount() {
         // Get saved amount from localStorage
         return localStorage.getItem('savedAmount') || '0';
@@ -522,7 +540,10 @@
             
             // Load transaction data
             this.currentAmount = transaction.amount.toString();
-            this.selectedCategory = transaction.category; // Mantener la categoría original
+            // Solo usar la categoría original si no hay una categoría ya seleccionada
+            if (!this.selectedCategory) {
+              this.selectedCategory = transaction.category;
+            }
             this.transactionType = transaction.type || 'expense';
             
             console.log('🔍 Cargando transacción para editar:');
