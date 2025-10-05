@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.3 - Debug Call</span>
+            <span class="text-xs text-gray-400">v2.9.4 - Error Debug</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -597,9 +597,12 @@
           }
         } catch (error) {
           console.error('❌ Error loading categories from Firebase in 1.html:', error);
+          console.error('❌ Error details:', error.message);
+          console.error('❌ Error stack:', error.stack);
         }
         
         // If no categories found, return Unknown
+        console.log('❌ Retornando categoría Unknown para:', category);
         return { name: "Unknown", displayName: "Unknown", icon: "fas fa-question", color: "bg-gray-500" };
       }
 
