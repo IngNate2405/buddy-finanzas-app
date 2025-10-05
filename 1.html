@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.9 - More Debug Logs</span>
+            <span class="text-xs text-gray-400">v2.10.0 - Debug Function Calls</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -908,8 +908,10 @@
          categoriesTab.classList.add('bg-[#2d3748]', 'text-gray-400');
        }
 
-       async updateSpendingCharts() {
-         const transactions = await this.getTransactionsForMonth();
+      async updateSpendingCharts() {
+        console.log('🔍 DEBUG updateSpendingCharts - INICIANDO');
+        const transactions = await this.getTransactionsForMonth();
+        console.log('🔍 DEBUG updateSpendingCharts - transactions:', transactions);
          
          // Calculate totals
          let income = 0;
@@ -950,8 +952,9 @@
          // Update donut chart with current active tab
          this.updateDonutChartForTab(this.activeCategoryTab);
          
-         // Update categories list based on active tab
-         await this.updateCategoriesListForTab(this.activeCategoryTab);
+        // Update categories list based on active tab
+        console.log('🔍 DEBUG updateSpendingCharts - Llamando updateCategoriesListForTab con activeCategoryTab:', this.activeCategoryTab);
+        await this.updateCategoriesListForTab(this.activeCategoryTab);
        }
 
        toggleBarChart(income, expenses, balance) {
@@ -1578,12 +1581,13 @@
         return colorMap[tailwindColor] || '#9ca3af';
        }
 
-       async switchCategoryTab(tabType) {
-         const headTab = document.getElementById('headCategoriesTab');
-         const categoriesTab = document.getElementById('categoriesTab');
-         
-         // Update active tab
-         this.activeCategoryTab = tabType;
+      async switchCategoryTab(tabType) {
+        console.log('🔍 DEBUG switchCategoryTab - INICIANDO con tabType:', tabType);
+        const headTab = document.getElementById('headCategoriesTab');
+        const categoriesTab = document.getElementById('categoriesTab');
+        
+        // Update active tab
+        this.activeCategoryTab = tabType;
          
          if (tabType === 'head') {
            headTab.classList.remove('bg-[#2d3748]', 'text-gray-400');
@@ -1597,8 +1601,9 @@
            headTab.classList.add('bg-[#2d3748]', 'text-gray-400');
          }
          
-         // Update categories list based on selected tab
-         await this.updateCategoriesListForTab(tabType);
+        // Update categories list based on selected tab
+        console.log('🔍 DEBUG switchCategoryTab - Llamando updateCategoriesListForTab con tabType:', tabType);
+        await this.updateCategoriesListForTab(tabType);
          
          // Update donut chart based on selected tab
          await this.updateDonutChartForTab(tabType);
