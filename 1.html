@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.5 - Display Fix</span>
+            <span class="text-xs text-gray-400">v2.9.6 - Remove Bad Mapping</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -477,17 +477,8 @@
         try {
           console.log('🚀 INICIANDO getCategoryInfo en 1.html con categoría:', category);
           
-          // Mapeo inverso: de subcategorías a categorías de Telegram
-          const reverseCategoryMap = {
-            'Food': 'Food & drinks',
-            'Gas': 'Transportation',
-            'Cinema': 'Entertainment',
-            'Rent': 'Housing',
-            'Clothing': 'Lifestyle',
-            'Other': 'Miscellaneous',
-            'Salary': 'Income',
-            'Investment': 'Investments'
-          };
+          // Mapeo inverso: de subcategorías a categorías de Telegram (ELIMINADO - causaba problemas)
+          // const reverseCategoryMap = { ... }; // Ya no se usa
           
           // Get categories from Firebase
           const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
@@ -510,27 +501,7 @@
               };
             }
             
-            // Check if it's a mapped category that needs reverse mapping
-            const telegramCategory = reverseCategoryMap[category];
-            if (telegramCategory) {
-              console.log('🔄 Mapeo inverso en 1.html:', category, '->', telegramCategory);
-              
-              // Search through all sections for the original category
-              for (const [sectionName, categories] of Object.entries(categoriesData)) {
-                if (Array.isArray(categories)) {
-                  const foundCategory = categories.find(cat => cat.name === category);
-                  if (foundCategory) {
-                    console.log('✅ Categoría mapeada encontrada en sección en 1.html:', sectionName);
-                    return {
-                      name: telegramCategory, // Usar la categoría de Telegram
-                      displayName: foundCategory.name, // Mostrar la subcategoría
-                      icon: foundCategory.icon,
-                      color: foundCategory.color
-                    };
-                  }
-                }
-              }
-            }
+            // Lógica de mapeo inverso eliminada - causaba problemas
             
             // Ahora el bot de Telegram guarda subcategorías directamente, no necesitamos mapeo
             console.log('🔍 Buscando subcategoría directamente:', category);
