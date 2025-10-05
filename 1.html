@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.8.7 - Keep Original</span>
+            <span class="text-xs text-gray-400">v2.8.8 - Reverse Mapping</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -474,20 +474,33 @@
 
       async getCategoryInfo(category) {
         try {
-          console.log('🔍 Buscando categoría:', category);
+          console.log('🔍 Buscando categoría en 1.html:', category);
+          
+          // Mapeo inverso: de subcategorías a categorías de Telegram
+          const reverseCategoryMap = {
+            'Food': 'Food & drinks',
+            'Gas': 'Transportation',
+            'Cinema': 'Entertainment',
+            'Rent': 'Housing',
+            'Clothing': 'Lifestyle',
+            'Other': 'Miscellaneous',
+            'Salary': 'Income',
+            'Investment': 'Investments'
+          };
+          
           // Get categories from Firebase
           const firebaseService = window.firebaseServiceInstance || new window.FirebaseService();
           const categoriesData = await firebaseService.loadCategories();
           
-          console.log('📋 Categorías cargadas desde Firebase:', Object.keys(categoriesData || {}).length);
+          console.log('📋 Categorías cargadas desde Firebase en 1.html:', Object.keys(categoriesData || {}).length);
           
           if (categoriesData && Object.keys(categoriesData).length > 0) {
-            console.log('📊 Estructura de categorías:', Object.keys(categoriesData));
+            console.log('📊 Estructura de categorías en 1.html:', Object.keys(categoriesData));
             
             // Check if category exists directly as a key
             if (categoriesData[category]) {
               const foundCategory = categoriesData[category];
-              console.log('✅ Categoría encontrada directamente:', category);
+              console.log('✅ Categoría encontrada directamente en 1.html:', category);
               return {
                 name: category,
                 displayName: category,
@@ -496,12 +509,34 @@
               };
             }
             
+            // Check if it's a mapped category that needs reverse mapping
+            const telegramCategory = reverseCategoryMap[category];
+            if (telegramCategory) {
+              console.log('🔄 Mapeo inverso en 1.html:', category, '->', telegramCategory);
+              
+              // Search through all sections for the original category
+              for (const [sectionName, categories] of Object.entries(categoriesData)) {
+                if (Array.isArray(categories)) {
+                  const foundCategory = categories.find(cat => cat.name === category);
+                  if (foundCategory) {
+                    console.log('✅ Categoría mapeada encontrada en sección en 1.html:', sectionName);
+                    return {
+                      name: telegramCategory, // Usar la categoría de Telegram
+                      displayName: foundCategory.name, // Mostrar la subcategoría
+                      icon: foundCategory.icon,
+                      color: foundCategory.color
+                    };
+                  }
+                }
+              }
+            }
+            
             // Fallback: search through all sections for the category
             for (const [sectionName, categories] of Object.entries(categoriesData)) {
               if (Array.isArray(categories)) {
                 const foundCategory = categories.find(cat => cat.name === category);
                 if (foundCategory) {
-                  console.log('✅ Categoría encontrada en sección:', sectionName);
+                  console.log('✅ Categoría encontrada en sección en 1.html:', sectionName);
                   return {
                     name: foundCategory.name,
                     displayName: foundCategory.name,
@@ -511,12 +546,12 @@
                 }
               }
             }
-            console.log('❌ Categoría no encontrada:', category);
+            console.log('❌ Categoría no encontrada en 1.html:', category);
           } else {
-            console.log('❌ No hay categorías en Firebase');
+            console.log('❌ No hay categorías en Firebase en 1.html');
           }
         } catch (error) {
-          console.error('❌ Error loading categories from Firebase:', error);
+          console.error('❌ Error loading categories from Firebase in 1.html:', error);
         }
         
         // If no categories found, return Unknown
