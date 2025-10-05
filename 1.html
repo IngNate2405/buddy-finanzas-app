@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.8.9 - Debug Mapping</span>
+            <span class="text-xs text-gray-400">v2.9.0 - Fixed Categories</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -531,47 +531,8 @@
               }
             }
             
-            // Check if it's a Telegram category that needs mapping to subcategory
-            const telegramToSubcategoryMap = {
-              'Food & drinks': 'Food',
-              'Transportation': 'Gas',
-              'Entertainment': 'Cinema',
-              'Housing': 'Rent',
-              'Lifestyle': 'Clothing',
-              'Miscellaneous': 'Other',
-              'Income': 'Salary',
-              'Investments': 'Investment'
-            };
-            
-            const subcategory = telegramToSubcategoryMap[category];
-            if (subcategory) {
-              console.log('🔄 Mapeo directo de Telegram en 1.html:', category, '->', subcategory);
-              console.log('🔍 Buscando subcategoría:', subcategory);
-              
-              // Search through all sections for the subcategory
-              for (const [sectionName, categories] of Object.entries(categoriesData)) {
-                console.log('🔍 Revisando sección:', sectionName, 'con', categories.length, 'categorías');
-                if (Array.isArray(categories)) {
-                  const foundCategory = categories.find(cat => cat.name === subcategory);
-                  if (foundCategory) {
-                    console.log('✅ Subcategoría encontrada en sección en 1.html:', sectionName);
-                    console.log('📋 Datos de la categoría:', foundCategory);
-                    return {
-                      name: category, // Mantener la categoría original
-                      displayName: foundCategory.name, // Mostrar la subcategoría
-                      icon: foundCategory.icon,
-                      color: foundCategory.color
-                    };
-                  } else {
-                    console.log('❌ Subcategoría no encontrada en sección:', sectionName);
-                    console.log('📋 Categorías disponibles:', categories.map(cat => cat.name));
-                  }
-                }
-              }
-              console.log('❌ Subcategoría no encontrada en ninguna sección');
-            } else {
-              console.log('❌ No hay mapeo para categoría:', category);
-            }
+            // Ahora el bot de Telegram guarda subcategorías directamente, no necesitamos mapeo
+            console.log('🔍 Buscando subcategoría directamente:', category);
             
             // Fallback: search through all sections for the category
             for (const [sectionName, categories] of Object.entries(categoriesData)) {
