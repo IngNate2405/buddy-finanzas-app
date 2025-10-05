@@ -79,7 +79,7 @@
         <h2 id="transactionTitle" class="text-xs tracking-widest uppercase font-normal text-white opacity-70">
           New Transaction
         </h2>
-        <span class="text-xs text-gray-500">v2.8.6 - Force Mapping</span>
+        <span class="text-xs text-gray-500">v2.8.7 - Keep Original</span>
       </div>
     </div>
 
@@ -338,7 +338,7 @@
           categoryIcon.innerHTML = `<i class="${categoryInfo.icon} text-white"></i>`;
           
           // Update name
-          categoryName.textContent = categoryInfo.name;
+          categoryName.textContent = categoryInfo.displayName || categoryInfo.name;
           
           // Update the choose category button (keep it as "Choose Category")
           document.querySelector('#categorySection button').textContent = 'Choose Category';
@@ -394,7 +394,8 @@
                   if (foundCategory) {
                     console.log('✅ Categoría mapeada encontrada en sección en 2.html:', sectionName);
                     return {
-                      name: foundCategory.name,
+                      name: categoryName, // Mantener el nombre original para guardar
+                      displayName: foundCategory.name, // Mostrar el nombre mapeado
                       icon: foundCategory.icon,
                       color: foundCategory.color
                     };
@@ -520,11 +521,11 @@
             
             // Load transaction data
             this.currentAmount = transaction.amount.toString();
-            this.selectedCategory = transaction.category;
+            this.selectedCategory = transaction.category; // Mantener la categoría original
             this.transactionType = transaction.type || 'expense';
             
             console.log('🔍 Cargando transacción para editar:');
-            console.log('- Categoría:', transaction.category);
+            console.log('- Categoría original:', transaction.category);
             console.log('- Tipo:', transaction.type);
             console.log('- Monto:', transaction.amount);
             
