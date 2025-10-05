@@ -79,7 +79,7 @@
         <h2 id="transactionTitle" class="text-xs tracking-widest uppercase font-normal text-white opacity-70">
           New Transaction
         </h2>
-        <span class="text-xs text-gray-500">v2.8.5 - Telegram Mapping</span>
+        <span class="text-xs text-gray-500">v2.8.6 - Force Mapping</span>
       </div>
     </div>
 
@@ -371,8 +371,8 @@
           if (categoriesData && Object.keys(categoriesData).length > 0) {
             console.log('📊 Estructura de categorías en 2.html:', Object.keys(categoriesData));
             
-            // Check if category exists directly as a key
-            if (categoriesData[categoryName]) {
+            // Check if category exists directly as a key (but skip if it's a Telegram section)
+            if (categoriesData[categoryName] && !telegramCategoryMap[categoryName]) {
               const foundCategory = categoriesData[categoryName];
               console.log('✅ Categoría encontrada directamente en 2.html:', categoryName);
               return {
