@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.10.1 - Fix Firebase Integration</span>
+            <span class="text-xs text-gray-400">v2.10.2 - Fix Donut Chart Error</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -1111,16 +1111,16 @@
          requestAnimationFrame(animate);
        }
 
-       updateDonutChart(categoryTotals, tabType = 'categories') {
-         let categories;
-         
-         if (tabType === 'head') {
-           // Group categories into head categories
-           categories = this.groupCategoriesIntoHeadCategories(categoryTotals);
-         } else {
-           // Use individual categories - each category gets its own segment
-           categories = Object.values(categoryTotals);
-         }
+      updateDonutChart(categoryData, tabType = 'categories') {
+        let categories;
+        
+        if (tabType === 'head') {
+          // categoryData is already an array of head categories
+          categories = categoryData;
+        } else {
+          // categoryData is an object, convert to array
+          categories = Object.values(categoryData);
+        }
          
          const totalExpenses = categories.reduce((sum, cat) => sum + cat.amount, 0);
          
@@ -1679,9 +1679,15 @@
            }
          });
          
-         // Always pass categoryTotals (object) to updateDonutChart
-         // The function will handle the grouping internally based on tabType
-         this.updateDonutChart(categoryTotals, tabType);
+        // Handle grouping based on tabType before passing to updateDonutChart
+        if (tabType === 'head') {
+          // For head categories, group the categories first
+          const headCategories = await this.groupCategoriesIntoHeadCategories(categoryTotals);
+          this.updateDonutChart(headCategories, tabType);
+        } else {
+          // For individual categories, pass the object directly
+          this.updateDonutChart(categoryTotals, tabType);
+        }
        }
 
        animateViewTransition(view) {
