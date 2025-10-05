@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.1 - Display Fix</span>
+            <span class="text-xs text-gray-400">v2.9.2 - Debug Mapping</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -568,19 +568,27 @@
               
               // Search through all sections for the mapped category
               for (const [sectionName, categories] of Object.entries(categoriesData)) {
+                console.log('🔍 Revisando sección para mapeo:', sectionName, 'con', categories.length, 'categorías');
                 if (Array.isArray(categories)) {
                   const foundCategory = categories.find(cat => cat.name === mappedCategory);
                   if (foundCategory) {
                     console.log('✅ Categoría mapeada encontrada en sección en 1.html:', sectionName);
+                    console.log('📋 Datos de la categoría mapeada:', foundCategory);
                     return {
                       name: category, // Mantener el nombre original para compatibilidad
                       displayName: foundCategory.name, // Mostrar el nombre de la subcategoría
                       icon: foundCategory.icon,
                       color: foundCategory.color
                     };
+                  } else {
+                    console.log('❌ Subcategoría no encontrada en sección:', sectionName);
+                    console.log('📋 Categorías disponibles:', categories.map(cat => cat.name));
                   }
                 }
               }
+              console.log('❌ Categoría mapeada no encontrada en ninguna sección');
+            } else {
+              console.log('❌ No hay mapeo para categoría:', category);
             }
             console.log('❌ Categoría no encontrada en 1.html:', category);
           } else {
