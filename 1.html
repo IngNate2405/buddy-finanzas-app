@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.10.5 - Fix Function Name</span>
+            <span class="text-xs text-gray-400">v2.10.6 - Debug Date Grouping</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -674,10 +674,14 @@
       groupTransactionsByDate(transactions) {
         const groups = {};
         
+        console.log('🔍 DEBUG groupTransactionsByDate - Transacciones:', transactions);
+        
         transactions.forEach(transaction => {
           // Get the date from the transaction (we'll need to add this to the transaction data)
           // For now, we'll use a mock date or the current date
           const transactionDate = transaction.date || new Date().toISOString().split('T')[0];
+          
+          console.log('🔍 DEBUG - Transacción:', transaction.name, 'Fecha:', transactionDate);
           
           if (!groups[transactionDate]) {
             groups[transactionDate] = [];
@@ -685,6 +689,7 @@
           groups[transactionDate].push(transaction);
         });
         
+        console.log('🔍 DEBUG - Grupos finales:', Object.keys(groups));
         return groups;
       }
 
