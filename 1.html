@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.8 - Debug Head Categories</span>
+            <span class="text-xs text-gray-400">v2.9.9 - More Debug Logs</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -1621,29 +1621,38 @@
          await this.updateSpendingCharts();
        }
 
-       async updateCategoriesListForTab(tabType) {
-         const transactions = await this.getTransactionsForMonth();
-         const categoryTotals = {};
+      async updateCategoriesListForTab(tabType) {
+        console.log('🔍 DEBUG updateCategoriesListForTab - INICIANDO con tabType:', tabType);
+        const transactions = await this.getTransactionsForMonth();
+        console.log('🔍 DEBUG updateCategoriesListForTab - transactions:', transactions);
+        const categoryTotals = {};
          
-         transactions.forEach(t => {
-           if (t.type === this.activeTransactionType) {
-             if (!categoryTotals[t.category]) {
-               categoryTotals[t.category] = {
-                 amount: 0,
-                 name: t.name,
-                 icon: t.icon,
-                 color: t.color
-               };
-             }
-             categoryTotals[t.category].amount += t.amount;
-           }
-         });
+        transactions.forEach(t => {
+          console.log('🔍 DEBUG - Procesando transacción:', t);
+          if (t.type === this.activeTransactionType) {
+            console.log('🔍 DEBUG - Transacción coincide con activeTransactionType:', this.activeTransactionType);
+            if (!categoryTotals[t.category]) {
+              categoryTotals[t.category] = {
+                amount: 0,
+                name: t.name,
+                icon: t.icon,
+                color: t.color
+              };
+            }
+            categoryTotals[t.category].amount += t.amount;
+            console.log('🔍 DEBUG - Agregado a categoryTotals:', t.category, 'Amount:', categoryTotals[t.category].amount);
+          } else {
+            console.log('🔍 DEBUG - Transacción NO coincide con activeTransactionType:', this.activeTransactionType, 'vs', t.type);
+          }
+        });
          
-         if (tabType === 'head') {
-           // Show head categories in the list when head tab is active
-           const headCategories = this.groupCategoriesIntoHeadCategories(categoryTotals);
-           this.updateCategoriesListFromHeadCategories(headCategories);
-         } else {
+        if (tabType === 'head') {
+          // Show head categories in the list when head tab is active
+          console.log('🔍 DEBUG updateCategoriesListForTab - tabType es head, categoryTotals:', categoryTotals);
+          const headCategories = this.groupCategoriesIntoHeadCategories(categoryTotals);
+          console.log('🔍 DEBUG updateCategoriesListForTab - headCategories result:', headCategories);
+          this.updateCategoriesListFromHeadCategories(headCategories);
+        } else {
            // Show individual categories when categories tab is active
            this.updateCategoriesList(categoryTotals);
          }
