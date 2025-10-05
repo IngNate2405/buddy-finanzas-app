@@ -46,7 +46,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.9.7 - Fix Head Categories</span>
+            <span class="text-xs text-gray-400">v2.9.8 - Debug Head Categories</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -1275,10 +1275,12 @@
       }
 
       groupCategoriesIntoHeadCategories(categoryTotals) {
+        console.log('🔍 DEBUG groupCategoriesIntoHeadCategories - categoryTotals:', categoryTotals);
         const headCategories = {};
         
         // Get categories from localStorage to determine head categories dynamically
         const savedCategories = localStorage.getItem('categoriesData');
+        console.log('🔍 DEBUG - savedCategories from localStorage:', savedCategories);
         
         if (savedCategories) {
           const categoriesData = JSON.parse(savedCategories);
@@ -1310,19 +1312,27 @@
         
         // Sum up amounts for each head category based on the section each category belongs to
         Object.entries(categoryTotals).forEach(([categoryKey, categoryData]) => {
+          console.log('🔍 DEBUG - Procesando categoría:', categoryKey, 'Datos:', categoryData);
           // Skip categories with invalid names (like "0", empty strings, etc.)
           if (!categoryKey || categoryKey === '0' || categoryKey === '' || !categoryData || !categoryData.amount) {
+            console.log('🔍 DEBUG - Saltando categoría inválida:', categoryKey);
             return;
           }
           
           const headCategoryName = this.getHeadCategoryForCategory(categoryKey);
+          console.log('🔍 DEBUG - Categoría principal para', categoryKey, ':', headCategoryName);
           if (headCategories[headCategoryName]) {
             headCategories[headCategoryName].amount += categoryData.amount;
+            console.log('🔍 DEBUG - Agregado', categoryData.amount, 'a', headCategoryName, 'Total:', headCategories[headCategoryName].amount);
+          } else {
+            console.log('🔍 DEBUG - No se encontró categoría principal:', headCategoryName);
           }
         });
         
         // Return only head categories that have amounts > 0
-        return Object.values(headCategories).filter(cat => cat.amount > 0);
+        const result = Object.values(headCategories).filter(cat => cat.amount > 0);
+        console.log('🔍 DEBUG - Resultado final headCategories:', result);
+        return result;
        }
 
        updateCategoriesList(categoryTotals) {
