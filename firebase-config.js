@@ -1,7 +1,30 @@
 // Firebase configuration
-// Configuración real de tu proyecto Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyCWRROAhqFeKks0X8aPuhTqb_aieJJh9Io",
+// Se obtiene desde función pública del backend (Netlify) para no exponer claves en el repo
+// Puedes sobreescribir la URL con window.PUBLIC_CONFIG_URL si es necesario
+const PUBLIC_CONFIG_CANDIDATES = [
+  (typeof window !== 'undefined' && window.PUBLIC_CONFIG_URL) || '',
+  'https://buddy-finanzas-whatsapp.netlify.app/public-config'
+].filter(Boolean);
+
+async function fetchPublicFirebaseConfig() {
+  for (const url of PUBLIC_CONFIG_CANDIDATES) {
+    try {
+      const res = await fetch(url, { method: 'GET' });
+      if (res.ok) {
+        const cfg = await res.json();
+        if (cfg && cfg.apiKey) return cfg;
+      }
+    } catch (_) {
+      // intentar siguiente
+    }
+  }
+  return null;
+}
+
+const fetchedConfig = await fetchPublicFirebaseConfig();
+const firebaseConfig = fetchedConfig || {
+  // Fallback mínimo (solo para desarrollo local si la función no responde)
+  apiKey: "demo-key",
   authDomain: "buddy-finanzas.firebaseapp.com",
   projectId: "buddy-finanzas",
   storageBucket: "buddy-finanzas.firebasestorage.app",
