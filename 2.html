@@ -17,6 +17,12 @@
   </style>
   <script type="module" src="firebase-config.js"></script>
   <script>
+    // Desactivar console.log en producción
+    if (typeof console !== 'undefined') {
+      console.log = function () {};
+    }
+  </script>
+  <script>
     // Esperar Firebase y estado de auth antes de usar la página
     document.addEventListener('DOMContentLoaded', () => {
       (async () => {

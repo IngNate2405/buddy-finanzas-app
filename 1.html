@@ -12,6 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
   <link rel="manifest" href="manifest.json">
   <script type="module" src="firebase-config.js"></script>
+  <script>
+    // Desactivar console.log en producción
+    if (typeof console !== 'undefined') {
+      console.log = function () {};
+    }
+  </script>
   <meta name="theme-color" content="#a64fff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

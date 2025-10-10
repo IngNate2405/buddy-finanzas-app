@@ -16,6 +16,12 @@
     }
   </style>
   <script type="module" src="firebase-config.js"></script>
+  <script>
+    // Desactivar console.log en producción
+    if (typeof console !== 'undefined') {
+      console.log = function () {};
+    }
+  </script>
 </head>
 <body class="bg-[#0f1618] text-white min-h-screen flex flex-col items-center justify-center">
   <!-- Container -->

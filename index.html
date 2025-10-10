@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buddy Finanzas v2.10.7 - Fix Date Normalization</title>
   <script type="module">
+    // Desactivar console.log en producción
+    if (typeof console !== 'undefined') {
+      console.log = function () {};
+    }
     import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     
