@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Current balance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="manifest" href="manifest.json">
+  <script type="module" src="firebase-config.js"></script>
+  <meta name="theme-color" content="#a64fff">
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      overflow-x: hidden;
+    }
+    
+    /* Hide scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Hide scrollbar for Firefox */
+    html {
+      scrollbar-width: none;
+    }
+    
+    .keypad-button {
+      transition: all 0.2s ease;
+    }
+    
+    .keypad-button:active {
+      transform: scale(0.95);
+      background-color: #374151;
+    }
+  </style>
+  <script>
+    if (typeof console !== 'undefined') { console.log = function () {}; }
+    
+    let currentBalance = '0';
+    let isPositive = true;
+    let walletType = 'SPENDING';
+    let walletCategory = 'spending';
+    
+    // Get wallet info from URL parameters
+    function getWalletInfo() {
+      const urlParams = new URLSearchParams(window.location.search);
+      walletType = urlParams.get('type') || 'SPENDING';
+      walletCategory = urlParams.get('category') || 'spending';
+      
+      // Update title
+      document.querySelector('h1').textContent = walletType;
+    }
+    
+    function goBack() { 
+      window.location.href = 'create-wallet.html'; 
+    }
+    
+    function toggleSign() {
+      isPositive = !isPositive;
+      updateSignButtons();
+      updateDisplay();
+    }
+    
+    function updateSignButtons() {
+      const positiveBtn = document.getElementById('positiveBtn');
+      const negativeBtn = document.getElementById('negativeBtn');
+      
+      if (isPositive) {
+        positiveBtn.classList.remove('bg-gray-600', 'text-gray-400');
+        positiveBtn.classList.add('bg-gray-800', 'text-white');
+        negativeBtn.classList.remove('bg-gray-800', 'text-white');
+        negativeBtn.classList.add('bg-gray-600', 'text-gray-400');
+      } else {
+        negativeBtn.classList.remove('bg-gray-600', 'text-gray-400');
+        negativeBtn.classList.add('bg-gray-800', 'text-white');
+        positiveBtn.classList.remove('bg-gray-800', 'text-white');
+        positiveBtn.classList.add('bg-gray-600', 'text-gray-400');
+      }
+    }
+    
+    function updateDisplay() {
+      const display = document.getElementById('balanceDisplay');
+      const sign = isPositive ? '' : '-';
+      display.textContent = `Q ${sign}${currentBalance}`;
+    }
+    
+    function addDigit(digit) {
+      if (currentBalance === '0' && digit !== '.') {
+        currentBalance = digit;
+      } else if (digit === '.' && currentBalance.includes('.')) {
+        return; // Don't add multiple decimal points
+      } else {
+        currentBalance += digit;
+      }
+      updateDisplay();
+    }
+    
+    function deleteDigit() {
+      if (currentBalance.length > 1) {
+        currentBalance = currentBalance.slice(0, -1);
+      } else {
+        currentBalance = '0';
+      }
+      updateDisplay();
+    }
+    
+    function continueToNext() {
+      const finalBalance = parseFloat(currentBalance) * (isPositive ? 1 : -1);
+      console.log('Creating wallet:', {
+        type: walletType,
+        category: walletCategory,
+        balance: finalBalance
+      });
+      
+      // Here you would save the wallet to Firebase
+      alert(`Wallet "${walletType}" created with balance: Q ${finalBalance}`);
+      
+      // Navigate back to wallets
+      window.location.href = 'wallets.html';
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      getWalletInfo();
+      updateSignButtons();
+      updateDisplay();
+    });
+  </script>
+</head>
+<body class="bg-[#0f1618] text-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-[#1f292c] p-4 flex items-center justify-between">
+    <button onclick="goBack()" class="text-white text-2xl hover:text-gray-300 transition-colors">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <h1 class="text-white text-lg font-semibold">Spending</h1>
+    <div class="w-8"></div> <!-- Spacer for centering -->
+  </header>
+
+  <!-- Main content -->
+  <main class="flex-1 flex flex-col justify-between p-4">
+    
+    <!-- Balance Input Section -->
+    <div class="flex-1 flex flex-col justify-center items-center space-y-6">
+      <div class="text-center">
+        <h2 class="text-white text-3xl font-bold mb-2">Current balance</h2>
+        <p class="text-gray-400 text-sm">You can estimate now and change it later whenever you want.</p>
+      </div>
+      
+      <!-- Balance Display -->
+      <div class="bg-[#21282b] rounded-2xl p-6 w-full max-w-sm">
+        <div id="balanceDisplay" class="text-white text-4xl font-bold text-center">Q 0</div>
+      </div>
+      
+      <!-- Continue Button -->
+      <button onclick="continueToNext()" class="bg-white text-black rounded-2xl py-4 px-8 w-full max-w-sm font-bold text-lg hover:bg-gray-100 transition-colors">
+        CONTINUE
+      </button>
+    </div>
+
+    <!-- Keypad Section -->
+    <div class="space-y-4">
+      <!-- Sign Toggle -->
+      <div class="flex space-x-2">
+        <button id="positiveBtn" onclick="isPositive = true; toggleSign()" class="flex-1 bg-gray-800 text-white rounded-xl py-3 text-sm font-medium">
+          Positive
+        </button>
+        <button id="negativeBtn" onclick="isPositive = false; toggleSign()" class="flex-1 bg-gray-600 text-gray-400 rounded-xl py-3 text-sm font-medium">
+          Negative
+        </button>
+      </div>
+
+      <!-- Numeric Keypad -->
+      <div class="grid grid-cols-3 gap-3">
+        <!-- Row 1 -->
+        <button onclick="addDigit('1')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">1</button>
+        <button onclick="addDigit('2')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">2</button>
+        <button onclick="addDigit('3')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">3</button>
+        
+        <!-- Row 2 -->
+        <button onclick="addDigit('4')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">4</button>
+        <button onclick="addDigit('5')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">5</button>
+        <button onclick="addDigit('6')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">6</button>
+        
+        <!-- Row 3 -->
+        <button onclick="addDigit('7')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">7</button>
+        <button onclick="addDigit('8')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">8</button>
+        <button onclick="addDigit('9')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">9</button>
+        
+        <!-- Row 4 -->
+        <button onclick="addDigit('.')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">.</button>
+        <button onclick="addDigit('0')" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">0</button>
+        <button onclick="deleteDigit()" class="keypad-button bg-[#21282b] text-white rounded-xl py-4 text-xl font-medium">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom indicator -->
+  <div class="h-1 bg-white/20 mx-auto w-32 rounded-full mb-2"></div>
+</body>
+</html>

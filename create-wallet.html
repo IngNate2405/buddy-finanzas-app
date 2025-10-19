@@ -34,8 +34,8 @@
     
     function selectWalletType(type, category) {
       console.log('Selected wallet type:', type, 'Category:', category);
-      // Aquí puedes agregar lógica para crear el wallet
-      alert(`Creating ${type} wallet in ${category} category`);
+      // Navigate to balance screen with wallet info
+      window.location.href = `wallet-balance.html?type=${encodeURIComponent(type)}&category=${encodeURIComponent(category)}`;
     }
     
     function switchTab(tab) {
