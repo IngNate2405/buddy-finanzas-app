@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create wallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="manifest" href="manifest.json">
+  <script type="module" src="firebase-config.js"></script>
+  <meta name="theme-color" content="#a64fff">
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      overflow-x: hidden;
+    }
+    
+    /* Hide scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Hide scrollbar for Firefox */
+    html {
+      scrollbar-width: none;
+    }
+  </style>
+  <script>
+    if (typeof console !== 'undefined') { console.log = function () {}; }
+    
+    function goBack() { 
+      window.location.href = 'wallets.html'; 
+    }
+    
+    function selectWalletType(type, category) {
+      console.log('Selected wallet type:', type, 'Category:', category);
+      // Aquí puedes agregar lógica para crear el wallet
+      alert(`Creating ${type} wallet in ${category} category`);
+    }
+    
+    function switchTab(tab) {
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('text-white', 'border-b-2', 'border-cyan-400');
+        btn.classList.add('text-gray-400');
+      });
+      
+      // Add active class to selected tab
+      const activeTab = document.getElementById(tab + 'Tab');
+      activeTab.classList.remove('text-gray-400');
+      activeTab.classList.add('text-white', 'border-b-2', 'border-cyan-400');
+      
+      // Show/hide content based on tab
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+      
+      document.getElementById(tab + 'Content').style.display = 'block';
+    }
+  </script>
+</head>
+<body class="bg-[#0f1618] text-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-[#1f292c] p-4 flex items-center justify-between">
+    <button onclick="goBack()" class="text-white text-2xl hover:text-gray-300 transition-colors">
+      <i class="fas fa-times"></i>
+    </button>
+    <h1 class="text-white text-lg font-semibold">Create wallet</h1>
+    <div class="w-8"></div> <!-- Spacer for centering -->
+  </header>
+
+  <!-- Navigation tabs -->
+  <nav class="bg-[#1f292c] flex justify-center space-x-8 py-4">
+    <button id="spendingTab" class="tab-button text-white border-b-2 border-cyan-400 px-4 py-2 text-sm font-medium" onclick="switchTab('spending')">
+      SPENDING
+    </button>
+    <button id="savingTab" class="tab-button text-gray-400 px-4 py-2 text-sm font-medium" onclick="switchTab('saving')">
+      SAVING
+    </button>
+    <button id="debtTab" class="tab-button text-gray-400 px-4 py-2 text-sm font-medium" onclick="switchTab('debt')">
+      DEBT
+    </button>
+  </nav>
+
+  <!-- Main content -->
+  <main class="flex-1 p-4">
+    
+    <!-- SPENDING Content -->
+    <div id="spendingContent" class="tab-content">
+      <div class="space-y-4">
+        <!-- SPENDING Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('SPENDING', 'spending')">
+          <div class="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center">
+            <i class="fas fa-wallet text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">SPENDING</h3>
+            <p class="text-gray-400 text-sm">The wallet for your daily spendings - i.e. your salary account.</p>
+          </div>
+        </div>
+
+        <!-- CREDIT Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('CREDIT', 'spending')">
+          <div class="w-16 h-16 rounded-2xl bg-red-500 flex items-center justify-center">
+            <i class="fas fa-credit-card text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">CREDIT</h3>
+            <p class="text-gray-400 text-sm">For your credit card or other accounts with credit limit.</p>
+          </div>
+        </div>
+
+        <!-- CASH Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('CASH', 'spending')">
+          <div class="w-16 h-16 rounded-2xl bg-purple-500 flex items-center justify-center">
+            <i class="fas fa-money-bill-wave text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">CASH</h3>
+            <p class="text-gray-400 text-sm">For money and transactions you make with cash.</p>
+          </div>
+        </div>
+
+        <!-- CUSTOM Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('CUSTOM', 'spending')">
+          <div class="w-16 h-16 rounded-2xl bg-gray-500 flex items-center justify-center">
+            <i class="fas fa-wallet text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">CUSTOM</h3>
+            <p class="text-gray-400 text-sm">Specify yourself</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVING Content -->
+    <div id="savingContent" class="tab-content" style="display: none;">
+      <!-- Info message -->
+      <div class="bg-[#21282b] rounded-2xl p-4 mb-4">
+        <p class="text-white text-sm">
+          People who set their savings goal save faster and up to <span class="font-bold">$550 more a year</span> than people who don't.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- SAVINGS Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('SAVINGS', 'saving')">
+          <div class="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center">
+            <i class="fas fa-piggy-bank text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">SAVINGS</h3>
+            <p class="text-gray-400 text-sm">Your default savings wallet.</p>
+          </div>
+        </div>
+
+        <!-- RAINY DAY FUND Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('RAINY DAY FUND', 'saving')">
+          <div class="w-16 h-16 rounded-2xl bg-pink-500 flex items-center justify-center">
+            <i class="fas fa-heart text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">RAINY DAY FUND</h3>
+            <p class="text-gray-400 text-sm">Reserved money for special need.</p>
+          </div>
+        </div>
+
+        <!-- TRIP Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('TRIP', 'saving')">
+          <div class="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center">
+            <i class="fas fa-smile text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">TRIP</h3>
+            <p class="text-gray-400 text-sm">Savings for a trip or your vacation.</p>
+          </div>
+        </div>
+
+        <!-- HOUSE Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('HOUSE', 'saving')">
+          <div class="w-16 h-16 rounded-2xl bg-orange-500 flex items-center justify-center">
+            <i class="fas fa-home text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">HOUSE</h3>
+            <p class="text-gray-400 text-sm">Save up to buy a house or apartment.</p>
+          </div>
+        </div>
+
+        <!-- CUSTOM Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('CUSTOM', 'saving')">
+          <div class="w-16 h-16 rounded-2xl bg-gray-500 flex items-center justify-center">
+            <i class="fas fa-wallet text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">CUSTOM</h3>
+            <p class="text-gray-400 text-sm">Specify yourself</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEBT Content -->
+    <div id="debtContent" class="tab-content" style="display: none;">
+      <!-- Info message -->
+      <div class="bg-[#21282b] rounded-2xl p-4 mb-4">
+        <p class="text-white text-sm">
+          Debt wallets reduces your net worth. Expenses added from debt wallet deminishes the remaining balance of the wallet.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- LOAN Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('LOAN', 'debt')">
+          <div class="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center">
+            <i class="fas fa-university text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">LOAN <i class="fas fa-lock text-xs"></i></h3>
+            <p class="text-gray-400 text-sm">Your bank loan, mortage or short term debt.</p>
+          </div>
+        </div>
+
+        <!-- PERSONAL DEBT Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('PERSONAL DEBT', 'debt')">
+          <div class="w-16 h-16 rounded-2xl bg-red-500 flex items-center justify-center">
+            <i class="fas fa-user text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">PERSONAL DEBT <i class="fas fa-lock text-xs"></i></h3>
+            <p class="text-gray-400 text-sm">Money that you owe someone else.</p>
+          </div>
+        </div>
+
+        <!-- CAR LOAN Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('CAR LOAN', 'debt')">
+          <div class="w-16 h-16 rounded-2xl bg-gray-600 flex items-center justify-center">
+            <i class="fas fa-car text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">CAR LOAN <i class="fas fa-lock text-xs"></i></h3>
+            <p class="text-gray-400 text-sm">Track your payments for your car loan.</p>
+          </div>
+        </div>
+
+        <!-- CUSTOM Wallet -->
+        <div class="bg-[#21282b] rounded-2xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-[#2a3338] transition-colors" onclick="selectWalletType('CUSTOM', 'debt')">
+          <div class="w-16 h-16 rounded-2xl bg-gray-500 flex items-center justify-center">
+            <i class="fas fa-wallet text-white text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-white font-bold text-lg">CUSTOM <i class="fas fa-lock text-xs"></i></h3>
+            <p class="text-gray-400 text-sm">Specify yourself</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom indicator -->
+  <div class="h-1 bg-white/20 mx-auto w-32 rounded-full mb-2"></div>
+</body>
+</html>
