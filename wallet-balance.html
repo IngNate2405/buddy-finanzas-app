@@ -56,8 +56,14 @@
       window.location.href = 'create-wallet.html'; 
     }
     
-    function toggleSign() {
-      isPositive = !isPositive;
+    function setPositive() {
+      isPositive = true;
+      updateSignButtons();
+      updateDisplay();
+    }
+    
+    function setNegative() {
+      isPositive = false;
       updateSignButtons();
       updateDisplay();
     }
@@ -163,10 +169,10 @@
     <div class="space-y-4">
       <!-- Sign Toggle -->
       <div class="flex space-x-2">
-        <button id="positiveBtn" onclick="isPositive = true; toggleSign()" class="flex-1 bg-gray-800 text-white rounded-xl py-3 text-sm font-medium">
+        <button id="positiveBtn" onclick="setPositive()" class="flex-1 bg-gray-800 text-white rounded-xl py-3 text-sm font-medium">
           Positive
         </button>
-        <button id="negativeBtn" onclick="isPositive = false; toggleSign()" class="flex-1 bg-gray-600 text-gray-400 rounded-xl py-3 text-sm font-medium">
+        <button id="negativeBtn" onclick="setNegative()" class="flex-1 bg-gray-600 text-gray-400 rounded-xl py-3 text-sm font-medium">
           Negative
         </button>
       </div>
