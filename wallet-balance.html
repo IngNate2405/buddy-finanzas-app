@@ -119,11 +119,8 @@
         balance: finalBalance
       });
       
-      // Here you would save the wallet to Firebase
-      alert(`Wallet "${walletType}" created with balance: Q ${finalBalance}`);
-      
-      // Navigate back to wallets
-      window.location.href = 'wallets.html';
+      // Navigate to wallet setup screen
+      window.location.href = `wallet-setup.html?type=${encodeURIComponent(walletType)}&category=${encodeURIComponent(walletCategory)}&balance=${finalBalance}`;
     }
     
     // Initialize when page loads

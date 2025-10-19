@@ -17,6 +17,44 @@
     if (typeof console !== 'undefined') { console.log = function () {}; }
     function goBack() { window.location.href = '1.html'; }
     
+    function loadWallets() {
+      const wallets = JSON.parse(localStorage.getItem('userWallets') || '[]');
+      const walletsContainer = document.getElementById('walletsContainer');
+      
+      if (wallets.length === 0) {
+        walletsContainer.innerHTML = `
+          <div class="text-center py-8">
+            <div class="text-gray-400 text-lg font-semibold mb-2">No wallets yet</div>
+            <div class="text-gray-500 text-sm">Create your first wallet to get started</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Calculate total net worth
+      const totalNetWorth = wallets.reduce((sum, wallet) => sum + wallet.balance, 0);
+      document.getElementById('totalNetWorth').textContent = `Q ${totalNetWorth.toLocaleString()}`;
+      
+      // Generate wallet cards
+      const walletsHTML = wallets.map(wallet => `
+        <div class="bg-[#21282b] rounded-2xl shadow-xl p-5 flex items-center justify-between">
+          <div>
+            <div class="text-xs tracking-[0.3em] opacity-60">${wallet.name.toUpperCase()}</div>
+            <div class="mt-1 text-4xl font-extrabold">Q ${wallet.balance.toLocaleString()}</div>
+            ${wallet.description ? `<div class="text-xs text-gray-400 mt-1">${wallet.description}</div>` : ''}
+          </div>
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style="background-color: ${wallet.color}">
+            <i class="fas fa-wallet text-white text-2xl"></i>
+          </div>
+        </div>
+      `).join('');
+      
+      walletsContainer.innerHTML = walletsHTML;
+    }
+    
+    // Load wallets when page loads
+    document.addEventListener('DOMContentLoaded', loadWallets);
+    
     // Function to open Telegram settings
     function openTelegramSettings() {
         try {
@@ -116,7 +154,7 @@
       <i class="fas fa-chevron-down ml-1">
       </i>
      </h1>
-            <span class="text-xs text-gray-400">v2.14.0 - Fix Positive/Negative Logic</span>
+            <span class="text-xs text-gray-400">v2.15.0 - Wallet Setup & Dynamic Display</span>
     </div>
    </div>
    <div class="flex items-center space-x-4">
@@ -140,38 +178,12 @@
   <div class="max-w-xl mx-auto px-4 py-6 space-y-4">
     <div class="text-center mb-2">
       <div class="text-xs tracking-[0.3em] opacity-70">WALLETS</div>
-      <div class="mt-1 text-4xl sm:text-5xl font-extrabold">Q 1,940</div>
+      <div id="totalNetWorth" class="mt-1 text-4xl sm:text-5xl font-extrabold">Q 0</div>
       <div class="mt-1 text-xs tracking-[0.3em] opacity-60">TOTAL NET WORTH</div>
     </div>
 
-    <div class="bg-[#21282b] rounded-2xl shadow-xl p-5 flex items-center justify-between">
-      <div>
-        <div class="text-xs tracking-[0.3em] opacity-60">CASH</div>
-        <div class="mt-1 text-4xl font-extrabold">-Q 35</div>
-      </div>
-      <div class="w-16 h-16 rounded-2xl bg-yellow-500/90 flex items-center justify-center shadow-lg">
-        <i class="fas fa-money-bill-wave text-white text-2xl"></i>
-      </div>
-    </div>
-
-    <div class="bg-[#21282b] rounded-2xl shadow-xl p-5 flex items-center justify-between">
-      <div>
-        <div class="text-xs tracking-[0.3em] opacity-60">AHORROS - GYT</div>
-        <div class="mt-1 text-4xl font-extrabold">Q 0</div>
-      </div>
-      <div class="w-16 h-16 rounded-2xl bg-red-500/90 flex items-center justify-center shadow-lg">
-        <i class="fas fa-piggy-bank text-white text-2xl"></i>
-      </div>
-    </div>
-
-    <div class="bg-[#21282b] rounded-2xl shadow-xl p-5 flex items-center justify-between">
-      <div>
-        <div class="text-xs tracking-[0.3em] opacity-60">DIARIO</div>
-        <div class="mt-1 text-4xl font-extrabold">Q 1,975</div>
-      </div>
-      <div class="w-16 h-16 rounded-2xl bg-blue-500/90 flex items-center justify-center shadow-lg">
-        <i class="fas fa-wallet text-white text-2xl"></i>
-      </div>
+    <div id="walletsContainer" class="space-y-4">
+      <!-- Wallets will be loaded dynamically here -->
     </div>
   </div>
 

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wallet Setup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="manifest" href="manifest.json">
+  <script type="module" src="firebase-config.js"></script>
+  <meta name="theme-color" content="#a64fff">
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      overflow-x: hidden;
+    }
+    
+    /* Hide scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Hide scrollbar for Firefox */
+    html {
+      scrollbar-width: none;
+    }
+    
+    .input-field {
+      background-color: #21282b;
+      border: 1px solid #374151;
+      transition: border-color 0.2s ease;
+    }
+    
+    .input-field:focus {
+      border-color: #a64fff;
+      outline: none;
+    }
+  </style>
+  <script>
+    if (typeof console !== 'undefined') { console.log = function () {}; }
+    
+    let walletData = {
+      type: 'SPENDING',
+      category: 'spending',
+      balance: 0,
+      name: '',
+      description: '',
+      color: '#60a5fa'
+    };
+    
+    // Get wallet info from URL parameters
+    function getWalletInfo() {
+      const urlParams = new URLSearchParams(window.location.search);
+      walletData.type = urlParams.get('type') || 'SPENDING';
+      walletData.category = urlParams.get('category') || 'spending';
+      walletData.balance = parseFloat(urlParams.get('balance')) || 0;
+      
+      // Set default name based on type
+      walletData.name = walletData.type;
+      
+      // Update display
+      updateDisplay();
+    }
+    
+    function goBack() { 
+      window.location.href = 'wallet-balance.html'; 
+    }
+    
+    function updateDisplay() {
+      // Update balance display
+      const balanceDisplay = document.getElementById('balanceDisplay');
+      const sign = walletData.balance >= 0 ? '' : '-';
+      balanceDisplay.textContent = `Q ${sign}${Math.abs(walletData.balance)}`;
+      
+      // Update name input
+      document.getElementById('walletName').value = walletData.name;
+      
+      // Update description input
+      document.getElementById('walletDescription').value = walletData.description;
+    }
+    
+    function updateName() {
+      walletData.name = document.getElementById('walletName').value;
+    }
+    
+    function updateDescription() {
+      walletData.description = document.getElementById('walletDescription').value;
+    }
+    
+    function selectColor(color) {
+      walletData.color = color;
+      
+      // Update color buttons
+      document.querySelectorAll('.color-option').forEach(btn => {
+        btn.classList.remove('ring-2', 'ring-white');
+      });
+      
+      event.target.classList.add('ring-2', 'ring-white');
+    }
+    
+    function saveWallet() {
+      // Validate required fields
+      if (!walletData.name.trim()) {
+        alert('Please enter a wallet name');
+        return;
+      }
+      
+      // Create wallet object
+      const newWallet = {
+        id: Date.now().toString(),
+        type: walletData.type,
+        category: walletData.category,
+        name: walletData.name.trim(),
+        description: walletData.description.trim(),
+        balance: walletData.balance,
+        color: walletData.color,
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log('Saving wallet:', newWallet);
+      
+      // Here you would save to Firebase
+      // For now, we'll save to localStorage
+      const existingWallets = JSON.parse(localStorage.getItem('userWallets') || '[]');
+      existingWallets.push(newWallet);
+      localStorage.setItem('userWallets', JSON.stringify(existingWallets));
+      
+      // Navigate back to wallets
+      window.location.href = 'wallets.html';
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      getWalletInfo();
+    });
+  </script>
+</head>
+<body class="bg-[#0f1618] text-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-[#1f292c] p-4 flex items-center justify-between">
+    <button onclick="goBack()" class="text-white text-2xl hover:text-gray-300 transition-colors">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <h1 class="text-white text-lg font-semibold">Setup Wallet</h1>
+    <div class="w-8"></div> <!-- Spacer for centering -->
+  </header>
+
+  <!-- Main content -->
+  <main class="flex-1 p-4 space-y-6">
+    
+    <!-- Balance Display -->
+    <div class="text-center">
+      <div class="bg-[#21282b] rounded-2xl p-6">
+        <div id="balanceDisplay" class="text-white text-4xl font-bold">Q 0</div>
+        <div class="text-gray-400 text-sm mt-2">Initial Balance</div>
+      </div>
+    </div>
+    
+    <!-- Wallet Name -->
+    <div class="space-y-2">
+      <label class="text-white text-sm font-medium">Wallet Name</label>
+      <input 
+        id="walletName"
+        type="text" 
+        class="input-field w-full rounded-xl px-4 py-3 text-white placeholder-gray-400"
+        placeholder="Enter wallet name"
+        oninput="updateName()"
+      />
+    </div>
+    
+    <!-- Description -->
+    <div class="space-y-2">
+      <label class="text-white text-sm font-medium">Description (Optional)</label>
+      <textarea 
+        id="walletDescription"
+        class="input-field w-full rounded-xl px-4 py-3 text-white placeholder-gray-400 h-20 resize-none"
+        placeholder="Enter description"
+        oninput="updateDescription()"
+      ></textarea>
+    </div>
+    
+    <!-- Color Selection -->
+    <div class="space-y-3">
+      <label class="text-white text-sm font-medium">Wallet Color</label>
+      <div class="flex space-x-3">
+        <button onclick="selectColor('#60a5fa')" class="color-option w-12 h-12 rounded-xl bg-blue-500 ring-2 ring-white"></button>
+        <button onclick="selectColor('#f472b6')" class="color-option w-12 h-12 rounded-xl bg-pink-500"></button>
+        <button onclick="selectColor('#fb923c')" class="color-option w-12 h-12 rounded-xl bg-orange-500"></button>
+        <button onclick="selectColor('#f87171')" class="color-option w-12 h-12 rounded-xl bg-red-500"></button>
+        <button onclick="selectColor('#9ca3af')" class="color-option w-12 h-12 rounded-xl bg-gray-500"></button>
+        <button onclick="selectColor('#a78bfa')" class="color-option w-12 h-12 rounded-xl bg-purple-500"></button>
+        <button onclick="selectColor('#4ade80')" class="color-option w-12 h-12 rounded-xl bg-green-500"></button>
+        <button onclick="selectColor('#facc15')" class="color-option w-12 h-12 rounded-xl bg-yellow-500"></button>
+      </div>
+    </div>
+    
+    <!-- Wallet Type Info -->
+    <div class="bg-[#21282b] rounded-2xl p-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background-color: #60a5fa;">
+          <i class="fas fa-wallet text-white text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold" id="walletTypeDisplay">SPENDING</h3>
+          <p class="text-gray-400 text-sm" id="walletCategoryDisplay">spending</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Actions -->
+  <div class="p-4 space-y-3">
+    <button onclick="saveWallet()" class="bg-white text-black rounded-2xl py-4 w-full font-bold text-lg hover:bg-gray-100 transition-colors">
+      SAVE
+    </button>
+    <button onclick="goBack()" class="bg-[#21282b] text-white rounded-2xl py-4 w-full font-medium hover:bg-[#2a3338] transition-colors">
+      CANCEL
+    </button>
+  </div>
+
+  <!-- Bottom indicator -->
+  <div class="h-1 bg-white/20 mx-auto w-32 rounded-full mb-2"></div>
+</body>
+</html>
