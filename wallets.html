@@ -15,25 +15,123 @@
   <script>
     if (typeof console !== 'undefined') { console.log = function () {}; }
     function goBack() { window.location.href = '1.html'; }
+    
+    // Function to open Telegram settings
+    function openTelegramSettings() {
+        try {
+            window.location.href = 'telegram-settings.html';
+        } catch (error) {
+            console.error('❌ Error abriendo configuración de Telegram:', error);
+        }
+    }
+    
+    // Logout function
+    async function handleLogout() {
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        try {
+          // Clear user data from localStorage
+          localStorage.removeItem('userEmail');
+          localStorage.removeItem('userId');
+          
+          // Try Firebase logout if available
+          if (window.FirebaseService) {
+            const firebaseService = new window.FirebaseService();
+            await firebaseService.signOut();
+          }
+          
+          // Redirect to login page
+          window.location.href = 'login.html';
+        } catch (error) {
+          // Even if Firebase fails, still redirect
+          window.location.href = 'login.html';
+        }
+      }
+    }
+
+    // Clear all cache function
+    function clearAllCache() {
+      if (confirm('¿Estás seguro de que quieres limpiar todo el cache? Esto recargará la página.')) {
+        try {
+          // Clear localStorage
+          localStorage.clear();
+          console.log('✅ localStorage limpiado');
+          
+          // Clear sessionStorage
+          sessionStorage.clear();
+          console.log('✅ sessionStorage limpiado');
+          
+          // Clear service worker cache
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (let name of names) {
+                caches.delete(name);
+                console.log('✅ Cache eliminado:', name);
+              }
+            });
+          }
+          
+          // Clear IndexedDB (if exists)
+          if ('indexedDB' in window) {
+            indexedDB.databases().then(databases => {
+              databases.forEach(db => {
+                indexedDB.deleteDatabase(db.name);
+                console.log('✅ IndexedDB eliminado:', db.name);
+              });
+            });
+          }
+          
+          // Show success message
+          alert('Cache limpiado correctamente. Recargando página...');
+          
+          // Force reload
+          setTimeout(() => {
+            location.reload(true);
+          }, 1000);
+          
+        } catch (error) {
+          console.error('❌ Error limpiando cache:', error);
+          alert('Error limpiando cache: ' + error.message);
+        }
+      }
+    }
+    
+    // Add event listeners when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+      document.getElementById('clearCacheBtn').addEventListener('click', clearAllCache);
+    });
   </script>
 </head>
 <body class="bg-[#0f1618] text-white min-h-screen flex flex-col">
-  <!-- Header (reutilizado estilo 1.html) -->
+  <!-- Top bar -->
   <header class="bg-gradient-to-r from-[#a64fff] to-[#8a2aff] p-4 flex items-center justify-between">
-    <div class="flex items-center">
-      <div class="flex flex-col">
-        <h1 class="text-white text-lg font-normal">Wallets:</h1>
-        <span class="text-xs text-gray-200 opacity-80">v2.10.7</span>
-      </div>
+   <div class="flex items-center">
+    <div class="flex flex-col">
+     <h1 class="text-white text-lg font-normal">
+      Overview:
+      <span class="font-bold">
+       My Household
+      </span>
+      <i class="fas fa-chevron-down ml-1">
+      </i>
+     </h1>
+            <span class="text-xs text-gray-400">v2.10.7 - Fix Date Normalization</span>
     </div>
-    <div class="flex items-center space-x-4">
-      <button id="telegramBtn" aria-label="Telegram Settings" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Configuración Telegram" onclick="location.href='telegram-settings.html'">
-        <i class="fab fa-telegram"></i>
-      </button>
-      <button id="logoutBtn" aria-label="Logout" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Cerrar Sesión">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
-    </div>
+   </div>
+   <div class="flex items-center space-x-4">
+    <button id="telegramBtn" aria-label="Telegram Settings" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Configuración Telegram" onclick="openTelegramSettings()">
+     <i class="fab fa-telegram">
+     </i>
+    </button>
+    <button id="logoutBtn" aria-label="Logout" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Cerrar Sesión">
+     <i class="fas fa-sign-out-alt">
+     </i>
+    </button>
+    <button id="clearCacheBtn" aria-label="Clear Cache" class="text-white text-2xl hover:text-gray-300 transition-colors" title="Limpiar Cache">
+     <i class="fas fa-broom">
+     </i>
+    </button>
+   </div>
   </header>
 
   <!-- Contenido centrado al ancho usado en 1.html -->
